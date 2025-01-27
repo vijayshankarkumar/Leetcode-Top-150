@@ -52,7 +52,7 @@ public:
 };
 ```
 
-#### 1. 27. Remove Element
+#### 2. 27. Remove Element
     
 Given an integer array nums and an integer val, remove all occurrences of val in nums in-place. The order of the elements may be changed. Then return the number of elements in nums which are not equal to val.
 
@@ -105,6 +105,226 @@ public:
             }
         }
         return i + 1;
+    }
+};
+```
+
+
+#### 3. 26. Remove Duplicates from Sorted Array
+
+Given an integer array nums sorted in non-decreasing order, remove the duplicates in-place such that each unique element appears only once. The relative order of the elements should be kept the same. Then return the number of unique elements in nums.
+
+Consider the number of unique elements of nums to be k, to get accepted, you need to do the following things:
+
+Change the array nums such that the first k elements of nums contain the unique elements in the order they were present in nums initially. The remaining elements of nums are not important as well as the size of nums.
+Return k.
+Custom Judge:
+
+The judge will test your solution with the following code:
+
+int[] nums = [...]; // Input array
+int[] expectedNums = [...]; // The expected answer with correct length
+
+int k = removeDuplicates(nums); // Calls your implementation
+
+assert k == expectedNums.length;
+for (int i = 0; i < k; i++) {
+    assert nums[i] == expectedNums[i];
+}
+If all assertions pass, then your solution will be accepted.
+
+Example 1:
+
+Input: nums = [1,1,2]
+Output: 2, nums = [1,2,_]
+Explanation: Your function should return k = 2, with the first two elements of nums being 1 and 2 respectively.
+It does not matter what you leave beyond the returned k (hence they are underscores).
+Example 2:
+
+Input: nums = [0,0,1,1,1,2,2,3,3,4]
+Output: 5, nums = [0,1,2,3,4,_,_,_,_,_]
+Explanation: Your function should return k = 5, with the first five elements of nums being 0, 1, 2, 3, and 4 respectively.
+It does not matter what you leave beyond the returned k (hence they are underscores).
+
+```cpp
+class Solution {
+public:
+    int removeDuplicates(vector<int>& nums) {
+        // [i ... j] contains all the duplicate values
+        int i = 0;
+        for (int j = 1; j < nums.size(); j++) {
+            if (nums[j] != nums[i]) {
+                swap(nums[i + 1], nums[j]);
+                i++;
+            }
+        }
+        return i + 1;
+    }
+};
+```
+
+#### 4. 80. Remove Duplicates from Sorted Array II
+
+Given an integer array nums sorted in non-decreasing order, remove some duplicates in-place such that each unique element appears at most twice. The relative order of the elements should be kept the same.
+
+Since it is impossible to change the length of the array in some languages, you must instead have the result be placed in the first part of the array nums. More formally, if there are k elements after removing the duplicates, then the first k elements of nums should hold the final result. It does not matter what you leave beyond the first k elements.
+
+Return k after placing the final result in the first k slots of nums.
+
+Do not allocate extra space for another array. You must do this by modifying the input array in-place with O(1) extra memory.
+
+Custom Judge:
+
+The judge will test your solution with the following code:
+
+int[] nums = [...]; // Input array
+int[] expectedNums = [...]; // The expected answer with correct length
+
+int k = removeDuplicates(nums); // Calls your implementation
+
+assert k == expectedNums.length;
+for (int i = 0; i < k; i++) {
+    assert nums[i] == expectedNums[i];
+}
+If all assertions pass, then your solution will be accepted.
+
+Example 1:
+
+Input: nums = [1,1,1,2,2,3]
+Output: 5, nums = [1,1,2,2,3,_]
+Explanation: Your function should return k = 5, with the first five elements of nums being 1, 1, 2, 2 and 3 respectively.
+It does not matter what you leave beyond the returned k (hence they are underscores).
+Example 2:
+
+Input: nums = [0,0,1,1,1,1,2,3,3]
+Output: 7, nums = [0,0,1,1,2,3,3,_,_]
+Explanation: Your function should return k = 7, with the first seven elements of nums being 0, 0, 1, 1, 2, 3 and 3 respectively.
+It does not matter what you leave beyond the returned k (hence they are underscores).
+
+```cpp
+class Solution {
+public:
+    int removeDuplicates(vector<int>& nums) {
+        if (nums.size() <= 2) return nums.size();
+        // [i ... j] contains all the values with
+        // frequency less than or equal to 2
+        int i = 1;
+        for (int j = 2; j < nums.size(); j++) {
+            if (nums[j] == nums[i] && nums[j] != nums[i - 1]) {
+                swap(nums[i + 1], nums[j]);
+                i++;
+            }
+            else if (nums[j] != nums[i]) {
+                swap(nums[i + 1], nums[j]);
+                i++;
+            }
+        }
+        nums.resize(i + 1);
+        return i + 1;  
+    }
+};
+```
+
+#### 5. 169. Majority Element
+
+Given an array nums of size n, return the majority element.
+
+The majority element is the element that appears more than ⌊n / 2⌋ times. You may assume that the majority element always exists in the array.
+
+ 
+
+Example 1:
+
+Input: nums = [3,2,3]
+Output: 3
+Example 2:
+
+Input: nums = [2,2,1,1,1,2,2]
+Output: 2
+
+```cpp
+class Solution {
+public:
+    int majorityElement(vector<int>& nums) {
+        // boyer moore algorithm
+        int me = INT_MIN, cnt = 0;
+        for (const auto& num: nums) {
+            cnt += num == me ? 1 : -1;
+            if (cnt <= 0) {
+                me = num;
+                cnt = 1;
+            }
+        }
+        return me;
+    }
+};
+```
+
+#### 6. 189. Rotate Array
+
+Given an integer array nums, rotate the array to the right by k steps, where k is non-negative.
+
+ 
+Example 1:
+
+Input: nums = [1,2,3,4,5,6,7], k = 3
+Output: [5,6,7,1,2,3,4]
+Explanation:
+rotate 1 steps to the right: [7,1,2,3,4,5,6]
+rotate 2 steps to the right: [6,7,1,2,3,4,5]
+rotate 3 steps to the right: [5,6,7,1,2,3,4]
+Example 2:
+
+Input: nums = [-1,-100,3,99], k = 2
+Output: [3,99,-1,-100]
+Explanation: 
+rotate 1 steps to the right: [99,-1,-100,3]
+rotate 2 steps to the right: [3,99,-1,-100]
+
+```cpp
+class Solution {
+public:
+    void rotate(vector<int>& nums, int k) {
+        reverse(nums.begin(), nums.end());
+        reverse(nums.begin(), nums.begin() + k % nums.size());
+        reverse(nums.begin() + k % nums.size(), nums.end());
+    }
+};
+```
+
+#### 7. 121. Best Time to Buy and Sell Stock
+
+You are given an array prices where prices[i] is the price of a given stock on the ith day.
+
+You want to maximize your profit by choosing a single day to buy one stock and choosing a different day in the future to sell that stock.
+
+Return the maximum profit you can achieve from this transaction. If you cannot achieve any profit, return 0.
+
+
+Example 1:
+
+Input: prices = [7,1,5,3,6,4]
+Output: 5
+Explanation: Buy on day 2 (price = 1) and sell on day 5 (price = 6), profit = 6-1 = 5.
+Note that buying on day 2 and selling on day 1 is not allowed because you must buy before you sell.
+Example 2:
+
+Input: prices = [7,6,4,3,1]
+Output: 0
+Explanation: In this case, no transactions are done and the max profit = 0.
+
+```cpp
+class Solution {
+public:
+    int maxProfit(vector<int>& prices) {
+        // take minimum price found so far to calcuate 
+        // current profit
+        int res = 0, mn = prices.front();
+        for (const auto& price: prices) {
+            res = max(res, price < mn ? 0 : price - mn);
+            mn = min(mn, price);
+        }
+        return res;
     }
 };
 ```
