@@ -328,3 +328,153 @@ public:
     }
 };
 ```
+
+#### 8. 122. Best Time to Buy and Sell Stock II
+
+You are given an integer array prices where prices[i] is the price of a given stock on the ith day.
+
+On each day, you may decide to buy and/or sell the stock. You can only hold at most one share of the stock at any time. However, you can buy it then immediately sell it on the same day.
+
+Find and return the maximum profit you can achieve.
+
+
+Example 1:
+
+Input: prices = [7,1,5,3,6,4]
+Output: 7
+Explanation: Buy on day 2 (price = 1) and sell on day 3 (price = 5), profit = 5-1 = 4.
+Then buy on day 4 (price = 3) and sell on day 5 (price = 6), profit = 6-3 = 3.
+Total profit is 4 + 3 = 7.
+Example 2:
+
+Input: prices = [1,2,3,4,5]
+Output: 4
+Explanation: Buy on day 1 (price = 1) and sell on day 5 (price = 5), profit = 5-1 = 4.
+Total profit is 4.
+Example 3:
+
+Input: prices = [7,6,4,3,1]
+Output: 0
+Explanation: There is no way to make a positive profit, so we never buy the stock to achieve the maximum profit of 0.
+
+```cpp
+class Solution {
+public:
+    int maxProfit(vector<int>& prices) {
+        int profit = 0;
+        for(int i = 1 ;i<prices.size() ;i++){
+            if(prices[i-1] < prices[i])
+                profit += prices[i] - prices[i-1];
+        }
+        return profit;
+    }
+};
+```
+
+#### 9. 55. Jump Game
+
+You are given an integer array nums. You are initially positioned at the array's first index, and each element in the array represents your maximum jump length at that position.
+
+Return true if you can reach the last index, or false otherwise.
+
+ 
+Example 1:
+
+Input: nums = [2,3,1,1,4]
+Output: true
+Explanation: Jump 1 step from index 0 to 1, then 3 steps to the last index.
+Example 2:
+
+Input: nums = [3,2,1,0,4]
+Output: false
+Explanation: You will always arrive at index 3 no matter what. Its maximum jump length is 0, which makes it impossible to reach the last index.
+
+```cpp
+class Solution {
+public:
+    bool canJump(vector<int>& nums) {
+        int curr = 0, max_so_far = 0;
+        for (int i = 0; i < nums.size(); i++) {
+            max_so_far = max(max_so_far, i + nums[i]);
+            if (i == curr) {
+                curr = max_so_far;
+                max_so_far = 0;
+            }
+            if (i > curr) return false;
+        }
+        return true;
+    }
+};
+```
+
+#### 10. 45. Jump Game II
+
+You are given a 0-indexed array of integers nums of length n. You are initially positioned at nums[0].
+
+Each element nums[i] represents the maximum length of a forward jump from index i. In other words, if you are at nums[i], you can jump to any nums[i + j] where:
+
+0 <= j <= nums[i] and
+i + j < n
+Return the minimum number of jumps to reach nums[n - 1]. The test cases are generated such that you can reach nums[n - 1].
+
+ 
+Example 1:
+
+Input: nums = [2,3,1,1,4]
+Output: 2
+Explanation: The minimum number of jumps to reach the last index is 2. Jump 1 step from index 0 to 1, then 3 steps to the last index.
+Example 2:
+
+Input: nums = [2,3,0,1,4]
+Output: 2
+
+```cpp
+class Solution {
+public:
+    int jump(vector<int>& nums) {
+        if (nums.size() == 1) return 0;
+        int res = 0, curr = 0, max_so_far = 0;
+        for (int i = 0; i < nums.size(); i++) {
+            max_so_far = max(max_so_far, i + nums[i]);
+            if (i == curr) {
+                curr = max_so_far;
+                max_so_far = 0;
+                if (curr >= nums.size() - 1) return res + 1;
+                res++;
+            }
+        }
+        return res;
+    }
+};
+```
+
+#### 11. 274. H-Index
+
+Given an array of integers citations where citations[i] is the number of citations a researcher received for their ith paper, return the researcher's h-index.
+
+According to the definition of h-index on Wikipedia: The h-index is defined as the maximum value of h such that the given researcher has published at least h papers that have each been cited at least h times.
+
+
+Example 1:
+
+Input: citations = [3,0,6,1,5]
+Output: 3
+Explanation: [3,0,6,1,5] means the researcher has 5 papers in total and each of them had received 3, 0, 6, 1, 5 citations respectively.
+Since the researcher has 3 papers with at least 3 citations each and the remaining two with no more than 3 citations each, their h-index is 3.
+Example 2:
+
+Input: citations = [1,3,1]
+Output: 1
+
+```cpp
+class Solution {
+public:
+    int hIndex(vector<int>& citations) {
+        sort(citations.begin(), citations.end());
+        for (int i = 0; i < citations.size(); i++) {
+            if (citations[i] >= citations.size() - i) return citations.size() - i;
+        }
+        return 0;
+    }
+};
+```
