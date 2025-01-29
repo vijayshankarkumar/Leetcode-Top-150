@@ -643,7 +643,7 @@ public:
 };
 ```
 
-#### 14. 135. Candy
+#### 15. 135. Candy
 
 There are n children standing in a line. Each child is assigned a rating value given in the integer array ratings.
 
@@ -692,3 +692,283 @@ public:
 };
 ```
 
+#### 16. 42. Trapping Rain Water
+
+Given n non-negative integers representing an elevation map where the width of each bar is 1, compute how much water it can trap after raining.
+ 
+
+Example 1:
+
+
+Input: height = [0,1,0,2,1,0,1,3,2,1,2,1]
+Output: 6
+Explanation: The above elevation map (black section) is represented by array [0,1,0,2,1,0,1,3,2,1,2,1]. In this case, 6 units of rain water (blue section) are being trapped.
+Example 2:
+
+Input: height = [4,2,0,3,2,5]
+Output: 9
+
+```cpp
+class Solution {
+public:
+    int trap(vector<int>& height) {
+        int n = height.size();
+        vector<int> leftMax(n), rightMax(n);
+        for (int i = 0; i < n; i++) {
+            leftMax[i] = i == 0 ? height[i] : max(leftMax[i - 1], height[i]);
+        }
+        for (int i = n - 1; i >= 0; i--) {
+            rightMax[i] = i == n - 1 ? height[i] : max(rightMax[i + 1], height[i]);
+        }
+        int ans = 0;
+        for (int i = 1; i < n - 1; i++) {
+            int currMax = min(leftMax[i - 1], rightMax[i + 1]);
+            if (currMax >= height[i]) ans += currMax - height[i];
+        }
+        return ans;
+    }
+};
+```
+
+#### 17. 13. Roman to Integer
+
+Roman numerals are represented by seven different symbols: I, V, X, L, C, D and M.
+
+Symbol       Value
+I             1
+V             5
+X             10
+L             50
+C             100
+D             500
+M             1000
+For example, 2 is written as II in Roman numeral, just two ones added together. 12 is written as XII, which is simply X + II. The number 27 is written as XXVII, which is XX + V + II.
+
+Roman numerals are usually written largest to smallest from left to right. However, the numeral for four is not IIII. Instead, the number four is written as IV. Because the one is before the five we subtract it making four. The same principle applies to the number nine, which is written as IX. There are six instances where subtraction is used:
+
+I can be placed before V (5) and X (10) to make 4 and 9. 
+X can be placed before L (50) and C (100) to make 40 and 90. 
+C can be placed before D (500) and M (1000) to make 400 and 900.
+Given a roman numeral, convert it to an integer.
+
+ 
+
+Example 1:
+
+Input: s = "III"
+Output: 3
+Explanation: III = 3.
+Example 2:
+
+Input: s = "LVIII"
+Output: 58
+Explanation: L = 50, V= 5, III = 3.
+Example 3:
+
+Input: s = "MCMXCIV"
+Output: 1994
+Explanation: M = 1000, CM = 900, XC = 90 and IV = 4.
+
+```cpp
+class Solution {
+public:
+    int char2num(char a) {
+        switch (a) {
+            case 'I': return 1;
+            case 'V': return 5;
+            case 'X': return 10;
+            case 'L': return 50;
+            case 'C': return 100;
+            case 'D': return 500;
+            case 'M': return 1000;
+            default: return 0;
+        }
+    }
+
+    int romanToInt(string s) {
+        int result = 0;
+        for (int i = 0; i < s.length(); i++) {
+            if (i + 1 < s.length() && char2num(s[i]) < char2num(s[i + 1])) {
+                result -= char2num(s[i]);
+            } else {
+                result += char2num(s[i]);
+            }
+        }
+        return result;
+    }
+};
+```
+
+#### 18. 12. Integer to Roman
+
+Seven different symbols represent Roman numerals with the following values:
+
+Symbol	Value
+I	1
+V	5
+X	10
+L	50
+C	100
+D	500
+M	1000
+Roman numerals are formed by appending the conversions of decimal place values from highest to lowest. Converting a decimal place value into a Roman numeral has the following rules:
+
+If the value does not start with 4 or 9, select the symbol of the maximal value that can be subtracted from the input, append that symbol to the result, subtract its value, and convert the remainder to a Roman numeral.
+If the value starts with 4 or 9 use the subtractive form representing one symbol subtracted from the following symbol, for example, 4 is 1 (I) less than 5 (V): IV and 9 is 1 (I) less than 10 (X): IX. Only the following subtractive forms are used: 4 (IV), 9 (IX), 40 (XL), 90 (XC), 400 (CD) and 900 (CM).
+Only powers of 10 (I, X, C, M) can be appended consecutively at most 3 times to represent multiples of 10. You cannot append 5 (V), 50 (L), or 500 (D) multiple times. If you need to append a symbol 4 times use the subtractive form.
+Given an integer, convert it to a Roman numeral.
+
+ 
+
+Example 1:
+
+Input: num = 3749
+
+Output: "MMMDCCXLIX"
+
+Explanation:
+
+3000 = MMM as 1000 (M) + 1000 (M) + 1000 (M)
+ 700 = DCC as 500 (D) + 100 (C) + 100 (C)
+  40 = XL as 10 (X) less of 50 (L)
+   9 = IX as 1 (I) less of 10 (X)
+Note: 49 is not 1 (I) less of 50 (L) because the conversion is based on decimal places
+Example 2:
+
+Input: num = 58
+
+Output: "LVIII"
+
+Explanation:
+
+50 = L
+ 8 = VIII
+Example 3:
+
+Input: num = 1994
+
+Output: "MCMXCIV"
+
+Explanation:
+
+1000 = M
+ 900 = CM
+  90 = XC
+   4 = IV
+
+```cpp
+class Solution {
+public:
+    string intToRoman(int num) {
+        string ones[] = {"","I","II","III","IV","V","VI","VII","VIII","IX"};
+        string tens[] = {"","X","XX","XXX","XL","L","LX","LXX","LXXX","XC"};
+        string hrns[] = {"","C","CC","CCC","CD","D","DC","DCC","DCCC","CM"};
+        string ths[]={"","M","MM","MMM"};
+        
+        return ths[num/1000] + hrns[(num%1000)/100] + tens[(num%100)/10] + ones[num%10];
+    }
+};
+```
+
+#### 19. 58. Length of Last Word
+
+Given a string s consisting of words and spaces, return the length of the last word in the string.
+
+A word is a maximal 
+substring
+ consisting of non-space characters only.
+
+
+Example 1:
+
+Input: s = "Hello World"
+Output: 5
+Explanation: The last word is "World" with length 5.
+Example 2:
+
+Input: s = "   fly me   to   the moon  "
+Output: 4
+Explanation: The last word is "moon" with length 4.
+Example 3:
+
+Input: s = "luffy is still joyboy"
+Output: 6
+Explanation: The last word is "joyboy" with length 6.
+
+```cpp
+class Solution {
+public:
+    int lengthOfLastWord(string s) {
+       istringstream is(s);
+       string word;
+       int res = 0;
+       while (is >> word) res = word.size();
+       return res; 
+    }
+};
+```
+
+#### 20. 14. Longest Common Prefix
+
+Write a function to find the longest common prefix string amongst an array of strings.
+
+If there is no common prefix, return an empty string "".
+
+
+Example 1:
+
+Input: strs = ["flower","flow","flight"]
+Output: "fl"
+Example 2:
+
+Input: strs = ["dog","racecar","car"]
+Output: ""
+Explanation: There is no common prefix among the input strings.
+ 
+```cpp
+class Solution {
+public:
+    string longestCommonPrefix(vector<string>& strs) {
+        string res;
+        while (true) {
+            if (res.size() == strs.front().size()) return res;
+            char ch = strs.front()[res.size()];
+            for (const auto& str: strs) {
+                if (str.size() < res.size()) return res;
+                if (str[res.size()] != ch) return res;
+            }
+            res.push_back(ch);
+        }
+        return "";
+    }
+};
+```
+
+#### 21. 151. Reverse Words in a String
+
+Given an input string s, reverse the order of the words.
+
+A word is defined as a sequence of non-space characters. The words in s will be separated by at least one space.
+
+Return a string of the words in reverse order concatenated by a single space.
+
+Note that s may contain leading or trailing spaces or multiple spaces between two words. The returned string should only have a single space separating the words. Do not include any extra spaces.
+
+Example 1:
+
+Input: s = "the sky is blue"
+Output: "blue is sky the"
+Example 2:
+
+Input: s = "  hello world  "
+Output: "world hello"
+Explanation: Your reversed string should not contain leading or trailing spaces.
+Example 3:
+
+Input: s = "a good   example"
+Output: "example good a"
+Explanation: You need to reduce multiple spaces between two words to a single space in the reversed string.
+
+```cpp
+
+```
