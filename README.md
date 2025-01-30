@@ -970,5 +970,332 @@ Output: "example good a"
 Explanation: You need to reduce multiple spaces between two words to a single space in the reversed string.
 
 ```cpp
-
+class Solution {
+public:
+    string reverseWords(string s) {
+        // make the string evenly spaced with one space between two words
+        for (int i = 0, j = 0; j < s.size(); j++) {
+            if (s[j] != ' ') {
+                if (i == j) i++;
+                else {
+                    s[i++] = s[j];
+                    s[j] = ' '; 
+                }
+            }
+            else {
+                if (i == 0 || s[i - 1] == ' ') continue;
+                else s[i++] = ' ';
+            }
+        }
+        // erase the remaining spaces at the end
+        s.erase(find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
+            return !isspace(ch);
+        }).base(), s.end());
+        // reverse the whole string
+        reverse(s.begin(), s.end());
+        // reverse the individual words
+        for (auto prev = s.begin(), it = s.begin(); it != s.end(); it++) {
+            if (*it == ' ') {
+                reverse(prev, it);
+                prev = it + 1;
+            }
+            if (it + 1 == s.end()) reverse(prev, s.end());
+        }
+        return s;
+    }
+};
 ```
+
+#### 22. 6. Zigzag Conversion
+
+The string "PAYPALISHIRING" is written in a zigzag pattern on a given number of rows like this: (you may want to display this pattern in a fixed font for better legibility)
+
+P   A   H   N
+A P L S I I G
+Y   I   R
+And then read line by line: "PAHNAPLSIIGYIR"
+
+Write the code that will take a string and make this conversion given a number of rows:
+
+string convert(string s, int numRows);
+ 
+
+Example 1:
+
+Input: s = "PAYPALISHIRING", numRows = 3
+Output: "PAHNAPLSIIGYIR"
+Example 2:
+
+Input: s = "PAYPALISHIRING", numRows = 4
+Output: "PINALSIGYAHRPI"
+Explanation:
+P     I    N
+A   L S  I G
+Y A   H R
+P     I
+Example 3:
+
+Input: s = "A", numRows = 1
+Output: "A"
+
+```cpp
+class Solution {
+public:
+    string convert(string s, int numRows) {
+        if (numRows <= 1) return s;
+        vector<string> mat(numRows, "");
+        int j = 0, dir = -1;
+        for (int i = 0; i < s.length(); i++) {
+            if (j == numRows - 1 || j == 0) dir *= (-1);
+            mat[j] += s[i];
+            if (dir == 1) j++;
+            else j--;
+        }
+        string res;
+        for (auto& it : mat) res += it;
+        return res;
+    }
+};
+```
+
+
+#### 23. 28. Find the Index of the First Occurrence in a String
+
+Given two strings needle and haystack, return the index of the first occurrence of needle in haystack, or -1 if needle is not part of haystack.
+ 
+
+Example 1:
+
+Input: haystack = "sadbutsad", needle = "sad"
+Output: 0
+Explanation: "sad" occurs at index 0 and 6.
+The first occurrence is at index 0, so we return 0.
+Example 2:
+
+Input: haystack = "leetcode", needle = "leeto"
+Output: -1
+Explanation: "leeto" did not occur in "leetcode", so we return -1.
+
+```cpp
+class Solution {
+public:
+    int strStr(string haystack, string needle) {
+        return haystack.find(needle);
+    }
+};
+```
+
+#### 24. 68. Text Justification
+Hard
+Topics
+Companies
+Given an array of strings words and a width maxWidth, format the text such that each line has exactly maxWidth characters and is fully (left and right) justified.
+
+You should pack your words in a greedy approach; that is, pack as many words as you can in each line. Pad extra spaces ' ' when necessary so that each line has exactly maxWidth characters.
+
+Extra spaces between words should be distributed as evenly as possible. If the number of spaces on a line does not divide evenly between words, the empty slots on the left will be assigned more spaces than the slots on the right.
+
+For the last line of text, it should be left-justified, and no extra space is inserted between words.
+
+Note:
+
+A word is defined as a character sequence consisting of non-space characters only.
+Each word's length is guaranteed to be greater than 0 and not exceed maxWidth.
+The input array words contains at least one word.
+ 
+
+Example 1:
+
+Input: words = ["This", "is", "an", "example", "of", "text", "justification."], maxWidth = 16
+Output:
+[
+   "This    is    an",
+   "example  of text",
+   "justification.  "
+]
+Example 2:
+
+Input: words = ["What","must","be","acknowledgment","shall","be"], maxWidth = 16
+Output:
+[
+  "What   must   be",
+  "acknowledgment  ",
+  "shall be        "
+]
+Explanation: Note that the last line is "shall be    " instead of "shall     be", because the last line must be left-justified instead of fully-justified.
+Note that the second line is also left-justified because it contains only one word.
+Example 3:
+
+Input: words = ["Science","is","what","we","understand","well","enough","to","explain","to","a","computer.","Art","is","everything","else","we","do"], maxWidth = 20
+Output:
+[
+  "Science  is  what we",
+  "understand      well",
+  "enough to explain to",
+  "a  computer.  Art is",
+  "everything  else  we",
+  "do                  "
+]
+
+```cpp
+class Solution {
+public:
+    vector<string> fullJustify(vector<string>& words, int maxWidth) {
+        vector<string> result;
+        int n = words.size();
+        int index = 0;
+
+        while (index < n) {
+            int totalChars = words[index].size();
+            int last = index + 1;
+
+            while (last < n && totalChars + words[last].size() + (last - index) <= maxWidth) {
+                totalChars += words[last].size();
+                last++;
+            }
+
+            string line;
+            int gaps = last - index - 1;
+
+            if (last == n || gaps == 0) {
+                for (int i = index; i < last; i++) {
+                    line += words[i];
+                    if (i < last - 1) line += " ";
+                }
+                line += string(maxWidth - line.size(), ' ');
+            } else {
+                int spaces = (maxWidth - totalChars) / gaps;
+                int extraSpaces = (maxWidth - totalChars) % gaps;
+
+                for (int i = index; i < last - 1; i++) {
+                    line += words[i];
+                    line += string(spaces + (i - index < extraSpaces ? 1 : 0), ' ');
+                }
+                line += words[last - 1];
+            }
+
+            result.push_back(line);
+            index = last;
+        }
+
+        return result;
+    }
+};
+```
+
+#### 25. 125. Valid Palindrome
+
+A phrase is a palindrome if, after converting all uppercase letters into lowercase letters and removing all non-alphanumeric characters, it reads the same forward and backward. Alphanumeric characters include letters and numbers.
+
+Given a string s, return true if it is a palindrome, or false otherwise.
+
+Example 1:
+
+Input: s = "A man, a plan, a canal: Panama"
+Output: true
+Explanation: "amanaplanacanalpanama" is a palindrome.
+Example 2:
+
+Input: s = "race a car"
+Output: false
+Explanation: "raceacar" is not a palindrome.
+Example 3:
+
+Input: s = " "
+Output: true
+Explanation: s is an empty string "" after removing non-alphanumeric characters.
+Since an empty string reads the same forward and backward, it is a palindrome.
+
+```cpp
+class Solution {
+public:
+    bool isAlpha(const char& ch) {
+        return !((ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z') || (ch >= '0' && ch <= '9'));
+    }
+
+    bool isPalindrome(string s) {
+        for (int i = 0, j = s.size() - 1; i < j;) {
+            if (!isAlpha(s[i]) && !isAlpha(s[j])) {
+                if (tolower(s[i]) != tolower(s[j])) return false;
+                i++;
+                j--;
+            }
+            else if (isAlpha(s[i])) i++;
+            else if (isAlpha(s[j])) j--;
+        }
+        return true;
+    }
+};
+```
+
+#### 26. 392. Is Subsequence
+
+Given two strings s and t, return true if s is a subsequence of t, or false otherwise.
+
+A subsequence of a string is a new string that is formed from the original string by deleting some (can be none) of the characters without disturbing the relative positions of the remaining characters. (i.e., "ace" is a subsequence of "abcde" while "aec" is not).
+ 
+
+Example 1:
+
+Input: s = "abc", t = "ahbgdc"
+Output: true
+Example 2:
+
+Input: s = "axc", t = "ahbgdc"
+Output: false
+
+```cpp
+class Solution {
+public:
+    bool isSubsequence(string s, string t) {
+        if (s.empty()) return true;
+        for (int i = 0, j = 0; i < s.size() && j < t.size(); j++) {
+            if (s[i] == t[j]) i++;
+            if (i == s.size()) return true;
+        }
+        return false;
+    }
+};
+```
+
+#### 27. 167. Two Sum II - Input Array Is Sorted
+
+Given a 1-indexed array of integers numbers that is already sorted in non-decreasing order, find two numbers such that they add up to a specific target number. Let these two numbers be numbers[index1] and numbers[index2] where 1 <= index1 < index2 <= numbers.length.
+
+Return the indices of the two numbers, index1 and index2, added by one as an integer array [index1, index2] of length 2.
+
+The tests are generated such that there is exactly one solution. You may not use the same element twice.
+
+Your solution must use only constant extra space.
+
+Example 1:
+
+Input: numbers = [2,7,11,15], target = 9
+Output: [1,2]
+Explanation: The sum of 2 and 7 is 9. Therefore, index1 = 1, index2 = 2. We return [1, 2].
+Example 2:
+
+Input: numbers = [2,3,4], target = 6
+Output: [1,3]
+Explanation: The sum of 2 and 4 is 6. Therefore index1 = 1, index2 = 3. We return [1, 3].
+Example 3:
+
+Input: numbers = [-1,0], target = -1
+Output: [1,2]
+Explanation: The sum of -1 and 0 is -1. Therefore index1 = 1, index2 = 2. We return [1, 2].
+
+```cpp
+class Solution {
+public:
+    vector<int> twoSum(vector<int>& numbers, int target) {
+        for (int i = 0, j = numbers.size() - 1; i < j;) {
+            if (numbers[i] + numbers[j] == target) return {i + 1, j + 1};
+            else if (numbers[i] + numbers[j] > target) j--;
+            else i++;
+        }
+        return {-1, -1};
+    }
+};
+```
+
+#### 28.
