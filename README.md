@@ -1298,4 +1298,171 @@ public:
 };
 ```
 
-#### 28.
+
+#### 28. 11. Container With Most Water
+
+You are given an integer array height of length n. There are n vertical lines drawn such that the two endpoints of the ith line are (i, 0) and (i, height[i]).
+
+Find two lines that together with the x-axis form a container, such that the container contains the most water.
+
+Return the maximum amount of water a container can store.
+
+Notice that you may not slant the container.
+ 
+
+Example 1:
+
+Input: height = [1,8,6,2,5,4,8,3,7]
+Output: 49
+Explanation: The above vertical lines are represented by array [1,8,6,2,5,4,8,3,7]. In this case, the max area of water (blue section) the container can contain is 49.
+Example 2:
+
+Input: height = [1,1]
+Output: 1
+
+```cpp
+class Solution {
+public:
+    int maxArea(vector<int>& height) {
+        int res = 0;
+        for (int i = 0, j = height.size() - 1; i < j;) {
+            res = max(res, min(height[i], height[j]) * (j - i));
+            if (height[i] < height[j]) i++;
+            else j--;
+        }
+        return res;
+    }
+};
+```
+
+#### 29. 15. 3Sum
+
+Given an integer array nums, return all the triplets [nums[i], nums[j], nums[k]] such that i != j, i != k, and j != k, and nums[i] + nums[j] + nums[k] == 0.
+
+Notice that the solution set must not contain duplicate triplets.
+
+Example 1:
+
+Input: nums = [-1,0,1,2,-1,-4]
+Output: [[-1,-1,2],[-1,0,1]]
+Explanation: 
+nums[0] + nums[1] + nums[2] = (-1) + 0 + 1 = 0.
+nums[1] + nums[2] + nums[4] = 0 + 1 + (-1) = 0.
+nums[0] + nums[3] + nums[4] = (-1) + 2 + (-1) = 0.
+The distinct triplets are [-1,0,1] and [-1,-1,2].
+Notice that the order of the output and the order of the triplets does not matter.
+Example 2:
+
+Input: nums = [0,1,1]
+Output: []
+Explanation: The only possible triplet does not sum up to 0.
+Example 3:
+
+Input: nums = [0,0,0]
+Output: [[0,0,0]]
+Explanation: The only possible triplet sums up to 0.
+
+```cpp
+class Solution {
+public:
+    vector<vector<int>> threeSum(vector<int>& nums) {
+        multiset<int> st(nums.begin(), nums.end());
+        set<vector<int>> res;
+        sort(nums.begin(), nums.end());
+        st.erase(st.find(nums.front()));
+        for (int j = 1; j < nums.size(); j++) {
+            st.erase(st.find(nums[j]));
+            for (int i = 0; i < j; i++) {
+                if (st.find(-1 * (nums[i] + nums[j])) != st.end()) {
+                    res.insert({nums[i], nums[j], -1 * (nums[i] + nums[j])});
+                }
+            }
+        }
+        return vector<vector<int>>(res.begin(), res.end());
+    }
+};
+```
+
+#### 30. 209. Minimum Size Subarray Sum
+
+Given an array of positive integers nums and a positive integer target, return the minimal length of a 
+subarray
+ whose sum is greater than or equal to target. If there is no such subarray, return 0 instead.
+
+Example 1:
+
+Input: target = 7, nums = [2,3,1,2,4,3]
+Output: 2
+Explanation: The subarray [4,3] has the minimal length under the problem constraint.
+Example 2:
+
+Input: target = 4, nums = [1,4,4]
+Output: 1
+Example 3:
+
+Input: target = 11, nums = [1,1,1,1,1,1,1,1]
+Output: 0
+
+```cpp
+class Solution {
+public:
+    int minSubArrayLen(int target, vector<int>& nums) {
+        int res = INT_MAX;
+        for (int i = 0, j = 0, curr = 0; j < nums.size(); j++) {
+            curr += nums[j];
+            while (curr >= target) {
+                curr -= nums[i];
+                res = min(res, j - i + 1);
+                i++;
+            }
+        }
+        return res == INT_MAX ? 0 : res;
+    }
+};
+```
+
+#### 31. 3. Longest Substring Without Repeating Characters
+
+Given a string s, find the length of the longest 
+substring
+ without repeating characters. 
+
+Example 1:
+
+Input: s = "abcabcbb"
+Output: 3
+Explanation: The answer is "abc", with the length of 3.
+Example 2:
+
+Input: s = "bbbbb"
+Output: 1
+Explanation: The answer is "b", with the length of 1.
+Example 3:
+
+Input: s = "pwwkew"
+Output: 3
+Explanation: The answer is "wke", with the length of 3.
+Notice that the answer must be a substring, "pwke" is a subsequence and not a substring.
+
+```cpp
+class Solution {
+public:
+    int lengthOfLongestSubstring(string s) {
+        int res = 0;
+        set<char> st;
+        for (int i = 0, j = 0; j < s.size(); j++) {
+            if (st.find(s[j]) != st.end()) {
+                while (s[i] != s[j]) {
+                    st.erase(st.find(s[i++]));
+                }
+                i++;
+            }
+            st.insert(s[j]);
+            res = max(res, j - i + 1);
+        }
+        return res;
+    }
+};
+```
+
+#### 32.
