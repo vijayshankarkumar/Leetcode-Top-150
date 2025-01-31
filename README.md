@@ -1565,5 +1565,405 @@ Explanation: Both 'a's from t must be included in the window.
 Since the largest window of s only has one 'a', return empty string.
 
 ```cpp
+class Solution {
+public:
+    bool valid(const vector<int>& at, const vector<int>& At, 
+               const vector<int>& as,const vector<int>& As) {
+        for (int i = 0; i < 26; i++) {
+            if (at[i] > as[i]) return false;
+            if (At[i] > As[i]) return false;
+        }
+        return true;
+    }
 
+    string minWindow(string s, string t) {
+        set<char> st(t.begin(), t.end());
+        vector<int> at(26), At(26), as(26), As(26);
+        for (const auto& c: t) {
+            if (c >= 'a' && c <= 'z') at[c - 'a']++;
+            else At[c - 'A']++;
+        }
+        int minSize = INT_MAX, l = -1, r = -1;
+        for (int i = 0, j = 0; j < s.size(); j++) {
+            if (st.find(s[j]) != st.end()) {
+                if (s[j] >= 'a' && s[j] <= 'z') as[s[j] - 'a']++;
+                else As[s[j] - 'A']++;
+            }
+            while (valid(at, At, as, As)) {
+                if (j - i + 1 < minSize) {
+                    l = i, r = j;
+                    minSize = j - i + 1;
+                }
+                if (st.find(s[i]) != st.end()) {
+                    if (s[i] >= 'a' && s[i] <= 'z') as[s[i] - 'a']--;
+                    else As[s[i] - 'A']--;
+                }
+                i++;
+            }
+        }
+        return minSize == INT_MAX ? "" : s.substr(l, r - l + 1);
+    }
+};
+```
+
+#### 34. 36. Valid Sudoku
+
+Determine if a 9 x 9 Sudoku board is valid. Only the filled cells need to be validated according to the following rules:
+
+Each row must contain the digits 1-9 without repetition.
+Each column must contain the digits 1-9 without repetition.
+Each of the nine 3 x 3 sub-boxes of the grid must contain the digits 1-9 without repetition.
+Note:
+
+A Sudoku board (partially filled) could be valid but is not necessarily solvable.
+Only the filled cells need to be validated according to the mentioned rules.
+ 
+
+Example 1:
+
+
+Input: board = 
+[["5","3",".",".","7",".",".",".","."]
+,["6",".",".","1","9","5",".",".","."]
+,[".","9","8",".",".",".",".","6","."]
+,["8",".",".",".","6",".",".",".","3"]
+,["4",".",".","8",".","3",".",".","1"]
+,["7",".",".",".","2",".",".",".","6"]
+,[".","6",".",".",".",".","2","8","."]
+,[".",".",".","4","1","9",".",".","5"]
+,[".",".",".",".","8",".",".","7","9"]]
+Output: true
+Example 2:
+
+Input: board = 
+[["8","3",".",".","7",".",".",".","."]
+,["6",".",".","1","9","5",".",".","."]
+,[".","9","8",".",".",".",".","6","."]
+,["8",".",".",".","6",".",".",".","3"]
+,["4",".",".","8",".","3",".",".","1"]
+,["7",".",".",".","2",".",".",".","6"]
+,[".","6",".",".",".",".","2","8","."]
+,[".",".",".","4","1","9",".",".","5"]
+,[".",".",".",".","8",".",".","7","9"]]
+Output: false
+Explanation: Same as Example 1, except with the 5 in the top left corner being modified to 8. Since there are two 8's in the top left 3x3 sub-box, it is invalid.
+
+```cpp
+class Solution {
+public:
+    bool isValidSudoku(vector<vector<char>>& board) {
+        // check rows
+        for (int i = 0; i < board.size(); i++) {
+            vector<int> curr(10);
+            for (int j = 0; j < board[0].size(); j++) {
+                if (board[i][j] == '.') continue;
+                if (++curr[board[i][j] - '0'] > 1) return false; 
+            }
+        }
+        // check columns
+        for (int j = 0; j < board[0].size(); j++) {
+            vector<int> curr(10);
+            for (int i = 0; i < board.size(); i++) {
+                if (board[i][j] == '.') continue;
+                if (++curr[board[i][j] - '0'] > 1) return false;
+            }
+        }
+        // check 3X3 grid
+        for (int i = 0; i < board.size(); i += 3) {
+            for (int j = 0; j < board[0].size(); j += 3) {
+                vector<int> curr(10);
+                for (int a = i; a < i + 3; a++) {
+                    for (int b = j; b < j + 3; b++) {
+                        if (board[a][b] == '.') continue;
+                        if (++curr[board[a][b] - '0'] > 1) return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+};
+```
+
+#### 35. 54. Spiral Matrix
+
+Given an m x n matrix, return all elements of the matrix in spiral order. 
+
+Example 1:
+
+
+Input: matrix = [[1,2,3],[4,5,6],[7,8,9]]
+Output: [1,2,3,6,9,8,7,4,5]
+Example 2:
+
+
+Input: matrix = [[1,2,3,4],[5,6,7,8],[9,10,11,12]]
+Output: [1,2,3,4,8,12,11,10,9,5,6,7]
+
+```cpp
+class Solution {
+public:
+    vector<int> spiralOrder(vector<vector<int>>& matrix) {
+        int n = matrix[0].size() - 1;
+        int m = matrix.size() - 1;
+        int top = 0;
+        int right = n;
+        int left = 0;
+        int bottom = m;
+
+        vector<int> res;
+
+        while(top <= bottom && left <= right){
+            // Top row
+            for(int i = left; i <= right; i++){
+                res.push_back(matrix[top][i]);
+            }
+            top++;
+
+            // Right column
+            for(int i = top; i <= bottom; i++){
+                res.push_back(matrix[i][right]);
+            }
+            right--;
+
+            if(top <= bottom){
+                // Bottom row
+                for(int i = right; i >= left; i--){
+                    res.push_back(matrix[bottom][i]);
+                }
+                bottom--;
+            }
+
+            if(left <= right){
+                // Left column
+                for(int i = bottom; i >= top; i--){
+                    res.push_back(matrix[i][left]);
+                }
+                left++;
+            }
+        }
+        return res;
+    }
+};
+```
+
+#### 36. 48. Rotate Image
+
+You are given an n x n 2D matrix representing an image, rotate the image by 90 degrees (clockwise).
+
+You have to rotate the image in-place, which means you have to modify the input 2D matrix directly. DO NOT allocate another 2D matrix and do the rotation.
+
+
+Example 1:
+
+
+Input: matrix = [[1,2,3],[4,5,6],[7,8,9]]
+Output: [[7,4,1],[8,5,2],[9,6,3]]
+Example 2:
+
+
+Input: matrix = [[5,1,9,11],[2,4,8,10],[13,3,6,7],[15,14,12,16]]
+Output: [[15,13,2,5],[14,3,4,1],[12,6,8,9],[16,7,10,11]]
+
+```cpp
+class Solution {
+public:
+    void rotate(vector<vector<int>>& matrix) {
+        // Transpose of matrix
+        for (int i = 0; i < matrix.size(); i++) {
+            for (int j = i; j < matrix.size(); j++) {
+                swap(matrix[i][j], matrix[j][i]);
+            }
+        }
+        // Reverse each row
+        for (int i = 0; i < matrix.size(); i++) {
+            for (int j = 0; j < matrix.size() / 2; j++) {
+                swap(matrix[i][j], matrix[i][matrix.size() - j - 1]);
+            }
+        }
+    }
+};
+```
+
+#### 37. 73. Set Matrix Zeroes
+
+Given an m x n integer matrix matrix, if an element is 0, set its entire row and column to 0's.
+
+You must do it in place.
+
+Example 1:
+
+
+Input: matrix = [[1,1,1],[1,0,1],[1,1,1]]
+Output: [[1,0,1],[0,0,0],[1,0,1]]
+Example 2:
+
+
+Input: matrix = [[0,1,2,0],[3,4,5,2],[1,3,1,5]]
+Output: [[0,0,0,0],[0,4,5,0],[0,3,1,0]]
+
+```cpp
+class Solution {
+public:
+    void setZeroes(vector<vector<int>>& matrix) {
+        if (matrix.empty())
+            return;
+
+        int m = matrix.size();
+        int n = matrix[0].size();
+
+        bool firstRowHasZero = false;
+        bool firstColHasZero = false;
+
+        // Check if the first row has a zero
+        for (int j = 0; j < n; j++) {
+            if (matrix[0][j] == 0) {
+                firstRowHasZero = true;
+                break;
+            }
+        }
+
+        // Check if the first column has a zero
+        for (int i = 0; i < m; i++) {
+            if (matrix[i][0] == 0) {
+                firstColHasZero = true;
+                break;
+            }
+        }
+
+        // Use the first row and first column to mark zeros
+        for (int i = 1; i < m; i++) {
+            for (int j = 1; j < n; j++) {
+                if (matrix[i][j] == 0) {
+                    matrix[i][0] = 0; // Mark the first column
+                    matrix[0][j] = 0; // Mark the first row
+                }
+            }
+        }
+
+        // Zero out rows based on marks in the first column
+        for (int i = 1; i < m; i++) {
+            if (matrix[i][0] == 0) {
+                for (int j = 1; j < n; j++) {
+                    matrix[i][j] = 0;
+                }
+            }
+        }
+
+        // Zero out columns based on marks in the first row
+        for (int j = 1; j < n; j++) {
+            if (matrix[0][j] == 0) {
+                for (int i = 1; i < m; i++) {
+                    matrix[i][j] = 0;
+                }
+            }
+        }
+
+        // Zero out the first row if needed
+        if (firstRowHasZero) {
+            for (int j = 0; j < n; j++) {
+                matrix[0][j] = 0;
+            }
+        }
+
+        // Zero out the first column if needed
+        if (firstColHasZero) {
+            for (int i = 0; i < m; i++) {
+                matrix[i][0] = 0;
+            }
+        }
+    }
+};
+```
+
+#### 38. 289. Game of Life
+
+According to Wikipedia's article: "The Game of Life, also known simply as Life, is a cellular automaton devised by the British mathematician John Horton Conway in 1970."
+
+The board is made up of an m x n grid of cells, where each cell has an initial state: live (represented by a 1) or dead (represented by a 0). Each cell interacts with its eight neighbors (horizontal, vertical, diagonal) using the following four rules (taken from the above Wikipedia article):
+
+Any live cell with fewer than two live neighbors dies as if caused by under-population.
+Any live cell with two or three live neighbors lives on to the next generation.
+Any live cell with more than three live neighbors dies, as if by over-population.
+Any dead cell with exactly three live neighbors becomes a live cell, as if by reproduction.
+The next state of the board is determined by applying the above rules simultaneously to every cell in the current state of the m x n grid board. In this process, births and deaths occur simultaneously.
+
+Given the current state of the board, update the board to reflect its next state.
+
+Note that you do not need to return anything.
+
+
+Example 1:
+
+
+Input: board = [[0,1,0],[0,0,1],[1,1,1],[0,0,0]]
+Output: [[0,0,0],[1,0,1],[0,1,1],[0,1,0]]
+Example 2:
+
+
+Input: board = [[1,1],[1,0]]
+Output: [[1,1],[1,1]]
+
+```cpp
+class Solution {
+public:
+    void gameOfLife(vector<vector<int>>& board) {
+        vector<vector<int>>ans(board);
+        vector<vector<int>>dir={{-1,-1},{-1,0},{-1,1},
+                                    {0,-1},{0,1},
+                                {1,1},{1,0},{1,-1}};
+        int n=board.size();
+        int m=board[0].size();
+        for(int i=0;i<n;i++){
+            for(int j=0;j<m;j++){
+                int ableToLive=0;
+                for(int k=0;k<8;k++){
+                    if(((i+dir[k][0]>=0) && (i+dir[k][0]<n)) && 
+                        (j+dir[k][1]>=0) && (j+dir[k][1]<m)){
+                        
+                        int row=i+dir[k][0], col=j+dir[k][1];
+                        if(ans[row][col]==1) ableToLive++;
+                    }
+                }
+                if(ans[i][j]==1 && (ableToLive<2 || ableToLive>3)) board[i][j]=0;
+
+                else if(ans[i][j]==0 && ableToLive==3) board[i][j]=1;
+                else if(ans[i][j]==1 && (ableToLive==2 || ableToLive==3 )) board[i][j]=1;
+            }
+        }
+    }
+};
+```
+
+#### 39. 383. Ransom Note
+
+Given two strings ransomNote and magazine, return true if ransomNote can be constructed by using the letters from magazine and false otherwise.
+
+Each letter in magazine can only be used once in ransomNote.
+ 
+
+Example 1:
+
+Input: ransomNote = "a", magazine = "b"
+Output: false
+Example 2:
+
+Input: ransomNote = "aa", magazine = "ab"
+Output: false
+Example 3:
+
+Input: ransomNote = "aa", magazine = "aab"
+Output: true
+
+```cpp
+class Solution {
+public:
+    bool canConstruct(string ransomNote, string magazine) {
+        vector<int> fr(26), fm(26);
+        for (const auto& ch: ransomNote) fr[ch - 'a']++;
+        for (const auto& ch: magazine) fm[ch - 'a']++;
+        for (int i = 0; i < 26; i++) if(fr[i] > fm[i]) return false;
+        return true;
+    }
+};
 ```
