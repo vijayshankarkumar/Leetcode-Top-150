@@ -2819,3 +2819,541 @@ public:
     }
 };
 ```
+
+#### 56. 108. Convert Sorted Array to Binary Search Tree
+
+Given an integer array nums where the elements are sorted in ascending order, convert it to a 
+height-balanced
+ binary search tree.
+
+
+Example 1:
+
+
+Input: nums = [-10,-3,0,5,9]
+Output: [0,-3,9,-10,null,5]
+Explanation: [0,-10,5,null,-3,null,9] is also accepted:
+
+Example 2:
+
+
+Input: nums = [1,3]
+Output: [3,1]
+Explanation: [1,null,3] and [3,1] are both height-balanced BSTs.
+
+```cpp
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    TreeNode* buildBST(int l, int r, const vector<int>& nums) {
+        if (l > r) return nullptr;
+        int m = (l + r) / 2;
+        TreeNode* root = new TreeNode(nums[m]);
+        root->left = buildBST(l, m - 1, nums);
+        root->right = buildBST(m + 1, r, nums);
+        return root;
+    }
+
+    TreeNode* sortedArrayToBST(vector<int>& nums) {
+        return buildBST(0, nums.size() - 1, nums);
+    }
+};
+```
+
+#### 57. 148. Sort List
+
+Given the head of a linked list, return the list after sorting it in ascending order.
+ 
+
+Example 1:
+
+
+Input: head = [4,2,1,3]
+Output: [1,2,3,4]
+Example 2:
+
+
+Input: head = [-1,5,3,4,0]
+Output: [-1,0,3,4,5]
+Example 3:
+
+Input: head = []
+Output: []
+
+```cpp
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+private:
+    ListNode* findMid(ListNode* head) {
+        ListNode* slow = head;
+        ListNode* fast = head->next;
+
+        while (fast != NULL && fast->next != NULL) {
+            slow = slow->next;
+            fast = fast->next->next;
+        }
+        return slow;
+    }
+
+    ListNode* merge(ListNode* left, ListNode* right) {
+
+        if (left == NULL) {
+            return right;
+        }
+
+        if (right == NULL) {
+
+            return right;
+        }
+
+        ListNode* ans = new ListNode(-1);
+        ListNode* temp = ans;
+
+        while (left != NULL && right != NULL) {
+
+            if (left->val < right->val) {
+                temp->next = left;
+                temp = left;
+                left = left->next;
+            } else {
+
+                temp->next = right;
+                temp = right;
+                right = right->next;
+            }
+        }
+
+        while (left != NULL) {
+            temp->next = left;
+            temp = left;
+            left = left->next;
+        }
+
+        while (right != NULL) {
+            temp->next = right;
+            temp = right;
+            right = right->next;
+        }
+
+        ans = ans->next;
+        return ans;
+    }
+
+public:
+    ListNode* sortList(ListNode* head) {
+
+        if (head == NULL || head->next == NULL) {
+
+            return head;
+        }
+
+        ListNode* mid = findMid(head);
+
+        ListNode* left = head;
+        ListNode* right = mid->next;
+        mid->next = NULL;
+
+        // recursive calls
+
+        left = sortList(left);
+        right = sortList(right);
+
+        ListNode* result = merge(left, right);
+
+        return result;
+    }
+};
+```
+
+#### 58. 427. Construct Quad Tree
+
+Given a n * n matrix grid of 0's and 1's only. We want to represent grid with a Quad-Tree.
+
+Return the root of the Quad-Tree representing grid.
+
+A Quad-Tree is a tree data structure in which each internal node has exactly four children. Besides, each node has two attributes:
+
+val: True if the node represents a grid of 1's or False if the node represents a grid of 0's. Notice that you can assign the val to True or False when isLeaf is False, and both are accepted in the answer.
+isLeaf: True if the node is a leaf node on the tree or False if the node has four children.
+class Node {
+    public boolean val;
+    public boolean isLeaf;
+    public Node topLeft;
+    public Node topRight;
+    public Node bottomLeft;
+    public Node bottomRight;
+}
+We can construct a Quad-Tree from a two-dimensional area using the following steps:
+
+If the current grid has the same value (i.e all 1's or all 0's) set isLeaf True and set val to the value of the grid and set the four children to Null and stop.
+If the current grid has different values, set isLeaf to False and set val to any value and divide the current grid into four sub-grids as shown in the photo.
+Recurse for each of the children with the proper sub-grid.
+
+If you want to know more about the Quad-Tree, you can refer to the wiki.
+
+Quad-Tree format:
+
+You don't need to read this section for solving the problem. This is only if you want to understand the output format here. The output represents the serialized format of a Quad-Tree using level order traversal, where null signifies a path terminator where no node exists below.
+
+It is very similar to the serialization of the binary tree. The only difference is that the node is represented as a list [isLeaf, val].
+
+If the value of isLeaf or val is True we represent it as 1 in the list [isLeaf, val] and if the value of isLeaf or val is False we represent it as 0.
+
+ 
+
+Example 1:
+
+
+Input: grid = [[0,1],[1,0]]
+Output: [[0,1],[1,0],[1,1],[1,1],[1,0]]
+Explanation: The explanation of this example is shown below:
+Notice that 0 represents False and 1 represents True in the photo representing the Quad-Tree.
+
+Example 2:
+
+
+
+Input: grid = [[1,1,1,1,0,0,0,0],[1,1,1,1,0,0,0,0],[1,1,1,1,1,1,1,1],[1,1,1,1,1,1,1,1],[1,1,1,1,0,0,0,0],[1,1,1,1,0,0,0,0],[1,1,1,1,0,0,0,0],[1,1,1,1,0,0,0,0]]
+Output: [[0,1],[1,1],[0,1],[1,1],[1,0],null,null,null,null,[1,0],[1,0],[1,1],[1,1]]
+Explanation: All values in the grid are not the same. We divide the grid into four sub-grids.
+The topLeft, bottomLeft and bottomRight each has the same value.
+The topRight have different values so we divide it into 4 sub-grids where each has the same value.
+Explanation is shown in the photo below:
+
+
+```cpp
+/*
+// Definition for a QuadTree node.
+class Node {
+public:
+    bool val;
+    bool isLeaf;
+    Node* topLeft;
+    Node* topRight;
+    Node* bottomLeft;
+    Node* bottomRight;
+    
+    Node() {
+        val = false;
+        isLeaf = false;
+        topLeft = NULL;
+        topRight = NULL;
+        bottomLeft = NULL;
+        bottomRight = NULL;
+    }
+    
+    Node(bool _val, bool _isLeaf) {
+        val = _val;
+        isLeaf = _isLeaf;
+        topLeft = NULL;
+        topRight = NULL;
+        bottomLeft = NULL;
+        bottomRight = NULL;
+    }
+    
+    Node(bool _val, bool _isLeaf, Node* _topLeft, Node* _topRight, Node* _bottomLeft, Node* _bottomRight) {
+        val = _val;
+        isLeaf = _isLeaf;
+        topLeft = _topLeft;
+        topRight = _topRight;
+        bottomLeft = _bottomLeft;
+        bottomRight = _bottomRight;
+    }
+};
+*/
+
+class Solution {
+public:
+    Node* buildQT(int r1, int c1, int r2, int c2, const vector<vector<int>>& grid) {
+        int tot = 0;
+        for (int i = r1; i <= r2; i++) {
+            for (int j = c1; j <= c2; j++) {
+                tot += grid[i][j];
+            }
+        }
+
+        if ((r2 - r1 + 1) * (c2 - c1 + 1) == tot || tot == 0) {
+            return new Node(tot == 0 ? 0 : 1, true);
+        }
+        
+        Node* root = new Node(grid[r1][c1], false);
+        int mr = (r1 + r2) / 2;
+        int mc = (c1 + c2) / 2;
+        root->topLeft = buildQT(r1, c1, mr, mc, grid);
+        root->topRight = buildQT(r1, mc + 1, mr, c2, grid);
+        root->bottomLeft = buildQT(mr + 1, c1, r2, mc, grid);
+        root->bottomRight = buildQT(mr + 1, mc + 1, r2, c2, grid);
+        return root;
+    }
+
+    Node* construct(vector<vector<int>>& grid) {
+        return buildQT(0, 0, grid.size() - 1, grid.size() - 1, grid);        
+    }
+};
+```
+
+#### 59. 23. Merge k Sorted Lists
+
+You are given an array of k linked-lists lists, each linked-list is sorted in ascending order.
+
+Merge all the linked-lists into one sorted linked-list and return it.
+ 
+
+Example 1:
+
+Input: lists = [[1,4,5],[1,3,4],[2,6]]
+Output: [1,1,2,3,4,4,5,6]
+Explanation: The linked-lists are:
+[
+  1->4->5,
+  1->3->4,
+  2->6
+]
+merging them into one sorted list:
+1->1->2->3->4->4->5->6
+Example 2:
+
+Input: lists = []
+Output: []
+Example 3:
+
+Input: lists = [[]]
+Output: []
+
+```cpp
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* mergeTwoList(ListNode* head1, ListNode* head2)  {
+        if (!head1) return head2;
+        if (!head2) return head1;
+        ListNode* ans = new ListNode(-1);
+        ListNode* ptr = ans;
+        while (head1 && head2) {
+            if (head1->val < head2->val) {
+                ptr->next = head1;
+                ptr = ptr->next;
+                head1 = head1->next;
+            } 
+            else {
+                ptr->next = head2;
+                ptr = ptr->next;
+                head2 = head2->next;
+            }
+        }
+        while (head1) {
+            ptr->next = head1;
+            ptr = ptr->next;
+            head1 = head1->next;
+        }
+        while (head2) {
+            ptr->next = head2;
+            ptr = ptr->next;
+            head2 = head2->next;
+        }
+        return ans->next;
+    }
+
+    ListNode* mergeKLists(vector<ListNode*>& lists) {
+        if (lists.size() == 0) return NULL;
+        ListNode* head1 = lists[0];
+        for (int i = 1; i < lists.size(); i++) head1 = mergeTwoList(head1, lists[i]);
+        return head1;
+    }
+};
+```
+
+#### 60. 53. Maximum Subarray
+Solved
+Medium
+Topics
+Companies
+Given an integer array nums, find the 
+subarray
+ with the largest sum, and return its sum.
+ 
+
+Example 1:
+
+Input: nums = [-2,1,-3,4,-1,2,1,-5,4]
+Output: 6
+Explanation: The subarray [4,-1,2,1] has the largest sum 6.
+Example 2:
+
+Input: nums = [1]
+Output: 1
+Explanation: The subarray [1] has the largest sum 1.
+Example 3:
+
+Input: nums = [5,4,-1,7,8]
+Output: 23
+Explanation: The subarray [5,4,-1,7,8] has the largest sum 23.
+
+```cpp
+class Solution {
+public:
+    int maxSubArray(vector<int>& nums) {
+        int res = -1e9, curr = -1e9;
+        for (const auto& num: nums) {
+            if (curr + num < num) curr = num;
+            else curr += num;
+            res = max(res, curr);
+        }
+        return res;
+    }
+};
+```
+
+#### 61. 918. Maximum Sum Circular Subarray
+
+Given a circular integer array nums of length n, return the maximum possible sum of a non-empty subarray of nums.
+
+A circular array means the end of the array connects to the beginning of the array. Formally, the next element of nums[i] is nums[(i + 1) % n] and the previous element of nums[i] is nums[(i - 1 + n) % n].
+
+A subarray may only include each element of the fixed buffer nums at most once. Formally, for a subarray nums[i], nums[i + 1], ..., nums[j], there does not exist i <= k1, k2 <= j with k1 % n == k2 % n.
+ 
+
+Example 1:
+
+Input: nums = [1,-2,3,-2]
+Output: 3
+Explanation: Subarray [3] has maximum sum 3.
+Example 2:
+
+Input: nums = [5,-3,5]
+Output: 10
+Explanation: Subarray [5,5] has maximum sum 5 + 5 = 10.
+Example 3:
+
+Input: nums = [-3,-2,-3]
+Output: -2
+Explanation: Subarray [-2] has maximum sum -2.
+
+```cpp
+class Solution {
+public:
+    int maxSubarraySumCircular(vector<int>& nums) {
+        // So there are two case.
+        // Case 1. The first is that the subarray take only a middle part, and
+        // we know how to find the max subarray sum. 
+        // Case2. The second is that
+        // the subarray take a part of head array and a part of tail array. We
+        // can transfer this case to the first one. The maximum result equals to
+        // the total sum minus the minimum subarray sum.
+        int total = 0, maxSum = nums.front(), curMax = 0, minSum = nums.front(), curMin = 0;
+        for (const auto& num: nums) {
+            curMax = max(curMax + num, num);
+            maxSum = max(maxSum, curMax);
+            curMin = min(curMin + num, num);
+            minSum = min(minSum, curMin);
+            total += num;
+        }
+        return maxSum > 0 ? max(maxSum, total - minSum) : maxSum;
+    }
+};
+```
+
+#### 62. 35. Search Insert Position
+
+Given a sorted array of distinct integers and a target value, return the index if the target is found. If not, return the index where it would be if it were inserted in order.
+
+You must write an algorithm with O(log n) runtime complexity.
+ 
+
+Example 1:
+
+Input: nums = [1,3,5,6], target = 5
+Output: 2
+Example 2:
+
+Input: nums = [1,3,5,6], target = 2
+Output: 1
+Example 3:
+
+Input: nums = [1,3,5,6], target = 7
+Output: 4
+
+```cpp
+class Solution {
+public:
+    int searchInsert(vector<int>& nums, int target) {
+        // return lower_bound(nums.begin(), nums.end(), target) - nums.begin();
+        // standard binary search implementation
+        int l = -1, r = nums.size();
+        while (r - l > 1) {
+            int m = l + (r - l) / 2;
+            if (nums[m] > target) r = m;
+            else l = m;
+        }
+        return l != -1 && nums[l] == target ? l : r;
+    }
+};
+```
+
+#### 63. 74. Search a 2D Matrix
+
+You are given an m x n integer matrix matrix with the following two properties:
+
+Each row is sorted in non-decreasing order.
+The first integer of each row is greater than the last integer of the previous row.
+Given an integer target, return true if target is in matrix or false otherwise.
+
+You must write a solution in O(log(m * n)) time complexity.
+ 
+
+Example 1:
+
+Input: matrix = [[1,3,5,7],[10,11,16,20],[23,30,34,60]], target = 3
+Output: true
+Example 2:
+
+
+Input: matrix = [[1,3,5,7],[10,11,16,20],[23,30,34,60]], target = 13
+Output: false
+
+```cpp
+class Solution {
+public:
+    bool searchMatrix(vector<vector<int>>& matrix, int target) {
+        int n = matrix.size(), m = matrix[0].size();
+        int l = -1, r = n * m;
+        while (r - l > 1) {
+            int mm = l + (r - l) / 2;
+            int row = mm / m;
+            int col = mm % m;
+            if (matrix[row][col] == target) return true;
+            else if (matrix[row][col] < target) l = mm;
+            else r = mm;
+        }
+        return false;
+    }
+};
+```
