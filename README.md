@@ -1967,3 +1967,855 @@ public:
     }
 };
 ```
+
+#### 40. 205. Isomorphic Strings
+
+Given two strings s and t, determine if they are isomorphic.
+
+Two strings s and t are isomorphic if the characters in s can be replaced to get t.
+
+All occurrences of a character must be replaced with another character while preserving the order of characters. No two characters may map to the same character, but a character may map to itself.
+
+Example 1:
+
+Input: s = "egg", t = "add"
+
+Output: true
+
+Explanation:
+
+The strings s and t can be made identical by:
+
+Mapping 'e' to 'a'.
+Mapping 'g' to 'd'.
+Example 2:
+
+Input: s = "foo", t = "bar"
+
+Output: false
+
+Explanation:
+
+The strings s and t can not be made identical as 'o' needs to be mapped to both 'a' and 'r'.
+
+Example 3:
+
+Input: s = "paper", t = "title"
+
+Output: true
+
+```cpp
+class Solution {
+public:
+    bool isIsomorphic(string s, string t) {
+        unordered_map<char, char> st, ts;
+        for (int i = 0; i < s.size(); i++) {
+            if (st.find(s[i]) != st.end() && st[s[i]] != t[i]) return false;
+            if (ts.find(t[i]) != ts.end() && ts[t[i]] != s[i]) return false;
+            st[s[i]] = t[i];
+            ts[t[i]] = s[i];
+        }
+        return true;
+    }
+};
+```
+
+#### 41. 290. Word Pattern
+
+Given a pattern and a string s, find if s follows the same pattern.
+
+Here follow means a full match, such that there is a bijection between a letter in pattern and a non-empty word in s. Specifically:
+
+Each letter in pattern maps to exactly one unique word in s.
+Each unique word in s maps to exactly one letter in pattern.
+No two letters map to the same word, and no two words map to the same letter.
+ 
+
+Example 1:
+
+Input: pattern = "abba", s = "dog cat cat dog"
+
+Output: true
+
+Explanation:
+
+The bijection can be established as:
+
+'a' maps to "dog".
+'b' maps to "cat".
+Example 2:
+
+Input: pattern = "abba", s = "dog cat cat fish"
+
+Output: false
+
+Example 3:
+
+Input: pattern = "aaaa", s = "dog cat cat dog"
+
+Output: false
+
+```cpp
+class Solution {
+public:
+    bool wordPattern(string pattern, string s) {
+        unordered_map<char, string> ps;
+        unordered_map<string, char> sp;
+        istringstream is(s);
+        string word;
+        int i = 0;
+        while (is >> word) {
+            if (ps.find(pattern[i]) != ps.end() && ps[pattern[i]] != word) return false;
+            if (sp.find(word) != sp.end() && sp[word] != pattern[i]) return false;
+            ps[pattern[i]] = word;
+            sp[word] = pattern[i];
+            i++;
+        }
+        return i == pattern.size();
+    }
+};
+```
+
+#### 42. 242. Valid Anagram
+
+Given two strings s and t, return true if t is an 
+anagram
+ of s, and false otherwise.
+
+
+Example 1:
+
+Input: s = "anagram", t = "nagaram"
+
+Output: true
+
+Example 2:
+
+Input: s = "rat", t = "car"
+
+Output: false
+
+```cpp
+class Solution {
+public:
+    bool isAnagram(string s, string t) {
+       vector<int> fs(26), ft(26);
+       for (const auto& ch: s) fs[ch - 'a']++;
+       for (const auto& ch: t) ft[ch - 'a']++;
+       for (int i = 0; i < 26; i++) if (fs[i] != ft[i]) return false;
+       return true; 
+    }
+};
+```
+
+#### 43. 1. Two Sum
+
+Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.
+
+You may assume that each input would have exactly one solution, and you may not use the same element twice.
+
+You can return the answer in any order.
+ 
+
+Example 1:
+
+Input: nums = [2,7,11,15], target = 9
+Output: [0,1]
+Explanation: Because nums[0] + nums[1] == 9, we return [0, 1].
+Example 2:
+
+Input: nums = [3,2,4], target = 6
+Output: [1,2]
+Example 3:
+
+Input: nums = [3,3], target = 6
+Output: [0,1]
+
+```cpp
+class Solution {
+public:
+    vector<int> twoSum(vector<int>& nums, int target) {
+        unordered_map<int, int> mp;
+        for (int i = 0; i < nums.size(); i++) {
+            if (mp.find(target - nums[i]) != mp.end()) return {mp[target - nums[i]], i};
+            mp[nums[i]] = i;
+        }
+        return {-1, -1};
+    }
+};
+```
+
+#### 44. 49. Group Anagrams
+
+Given an array of strings strs, group the 
+anagrams
+ together. You can return the answer in any order.
+ 
+
+Example 1:
+
+Input: strs = ["eat","tea","tan","ate","nat","bat"]
+
+Output: [["bat"],["nat","tan"],["ate","eat","tea"]]
+
+Explanation:
+
+There is no string in strs that can be rearranged to form "bat".
+The strings "nat" and "tan" are anagrams as they can be rearranged to form each other.
+The strings "ate", "eat", and "tea" are anagrams as they can be rearranged to form each other.
+Example 2:
+
+Input: strs = [""]
+
+Output: [[""]]
+
+Example 3:
+
+Input: strs = ["a"]
+
+Output: [["a"]]
+
+```cpp
+class Solution {
+public:
+    vector<vector<string>> groupAnagrams(vector<string>& strs) {
+        unordered_map<string, vector<string>> groups;
+        for (const auto& str: strs) {
+            string s = str;
+            sort(s.begin(), s.end());
+            groups[s].push_back(str);
+        }
+        vector<vector<string>> res;
+        for (const auto& [_, group]: groups) res.push_back(group);
+        return res;
+    }
+};
+```
+
+#### 45. 202. Happy Number
+
+Write an algorithm to determine if a number n is happy.
+
+A happy number is a number defined by the following process:
+
+Starting with any positive integer, replace the number by the sum of the squares of its digits.
+Repeat the process until the number equals 1 (where it will stay), or it loops endlessly in a cycle which does not include 1.
+Those numbers for which this process ends in 1 are happy.
+Return true if n is a happy number, and false if not.
+
+
+Example 1:
+
+Input: n = 19
+Output: true
+Explanation:
+12 + 92 = 82
+82 + 22 = 68
+62 + 82 = 100
+12 + 02 + 02 = 1
+Example 2:
+
+Input: n = 2
+Output: false
+
+```cpp
+class Solution {
+public:
+    unordered_set <int> st;
+    bool isHappy(int n) {
+        if(n == 1) return true;
+        
+        if (st.find(n) != st.end()) return false;
+        st.insert(n);
+
+        int sum = 0;
+        while(n!=0){
+            int digit = n % 10;
+            sum += digit * digit;
+            n = n/10;
+        }
+        return isHappy(sum);
+    }
+};
+```
+
+#### 46. 219. Contains Duplicate II
+
+Given an integer array nums and an integer k, return true if there are two distinct indices i and j in the array such that nums[i] == nums[j] and abs(i - j) <= k. 
+
+Example 1:
+
+Input: nums = [1,2,3,1], k = 3
+Output: true
+Example 2:
+
+Input: nums = [1,0,1,1], k = 1
+Output: true
+Example 3:
+
+Input: nums = [1,2,3,1,2,3], k = 2
+Output: false
+
+```cpp
+class Solution {
+public:
+    bool containsNearbyDuplicate(vector<int>& nums, int k) {
+        unordered_map<int, int> mp;
+        for (int i = 0; i < nums.size(); i++) {
+            if (mp.find(nums[i]) != mp.end() && i - mp[nums[i]] <= k) return true;
+            mp[nums[i]] = i;
+        }
+        return false;
+    }
+};
+```
+
+#### 47. 128. Longest Consecutive Sequence
+
+Given an unsorted array of integers nums, return the length of the longest consecutive elements sequence.
+
+You must write an algorithm that runs in O(n) time.
+ 
+
+Example 1:
+
+Input: nums = [100,4,200,1,3,2]
+Output: 4
+Explanation: The longest consecutive elements sequence is [1, 2, 3, 4]. Therefore its length is 4.
+Example 2:
+
+Input: nums = [0,3,7,2,5,8,4,6,0,1]
+Output: 9
+
+
+```cpp
+class Solution {
+public:
+    int longestConsecutive(vector<int>& nums) {
+        unordered_set<int> st(nums.begin(), nums.end());
+        int res = 0;
+        for(auto num: nums){
+            if(st.find(num - 1) == st.end()) {
+                int curr = 1;
+                while(st.find(num + 1) != st.end()){
+                    num++;
+                    curr++;
+                }
+                res = max(res, curr);
+            }
+        }
+        return res;
+    }
+};
+```
+
+#### 48. 228. Summary Ranges
+
+You are given a sorted unique integer array nums.
+
+A range [a,b] is the set of all integers from a to b (inclusive).
+
+Return the smallest sorted list of ranges that cover all the numbers in the array exactly. That is, each element of nums is covered by exactly one of the ranges, and there is no integer x such that x is in one of the ranges but not in nums.
+
+Each range [a,b] in the list should be output as:
+
+"a->b" if a != b
+"a" if a == b
+ 
+
+Example 1:
+
+Input: nums = [0,1,2,4,5,7]
+Output: ["0->2","4->5","7"]
+Explanation: The ranges are:
+[0,2] --> "0->2"
+[4,5] --> "4->5"
+[7,7] --> "7"
+Example 2:
+
+Input: nums = [0,2,3,4,6,8,9]
+Output: ["0","2->4","6","8->9"]
+Explanation: The ranges are:
+[0,0] --> "0"
+[2,4] --> "2->4"
+[6,6] --> "6"
+[8,9] --> "8->9"
+
+```cpp
+class Solution {
+public:
+    vector<string> summaryRanges(vector<int>& nums) {
+        if (nums.empty()) return {};
+        vector<string> res;
+        int start = nums.front(), prev = nums.front();
+        string str = "";
+        for (const auto& num: nums) {
+            if (prev + 1 != num) {
+                if (str != "") {
+                    if (start == prev) res.push_back(str);
+                    else res.push_back(str + "->" + to_string(prev));
+                }
+                str = to_string(num);
+                start = num;
+            }
+            prev = num;
+        }
+        if (str != "") {
+            if (start == prev) res.push_back(str);
+            else res.push_back(str + "->" + to_string(prev));
+        }
+        return res;
+    }
+};
+```
+
+#### 49. 56. Merge Intervals
+
+Given an array of intervals where intervals[i] = [starti, endi], merge all overlapping intervals, and return an array of the non-overlapping intervals that cover all the intervals in the input.
+
+
+Example 1:
+
+Input: intervals = [[1,3],[2,6],[8,10],[15,18]]
+Output: [[1,6],[8,10],[15,18]]
+Explanation: Since intervals [1,3] and [2,6] overlap, merge them into [1,6].
+Example 2:
+
+Input: intervals = [[1,4],[4,5]]
+Output: [[1,5]]
+Explanation: Intervals [1,4] and [4,5] are considered overlapping.
+
+```cpp
+class Solution {
+public:
+    vector<vector<int>> merge(vector<vector<int>>& intervals) {
+        sort(intervals.begin(), intervals.end(), [](const auto& a, const auto& b) {
+            return a[0] == b[0] ? a[1] < b[1] : a[0] < b[0];
+        });
+        vector<vector<int>> res;
+        int s = -1, e = -1;
+        for (const auto& interval: intervals) {
+            if (interval[0] > e) {
+                if (s != -1) res.push_back({s, e});
+                s = interval[0];
+            }
+            e = max(e, interval[1]);
+        }
+        res.push_back({s, e});
+        return res;
+    }
+};
+```
+
+#### 50. 57. Insert Interval
+
+You are given an array of non-overlapping intervals intervals where intervals[i] = [starti, endi] represent the start and the end of the ith interval and intervals is sorted in ascending order by starti. You are also given an interval newInterval = [start, end] that represents the start and end of another interval.
+
+Insert newInterval into intervals such that intervals is still sorted in ascending order by starti and intervals still does not have any overlapping intervals (merge overlapping intervals if necessary).
+
+Return intervals after the insertion.
+
+Note that you don't need to modify intervals in-place. You can make a new array and return it.
+ 
+
+Example 1:
+
+Input: intervals = [[1,3],[6,9]], newInterval = [2,5]
+Output: [[1,5],[6,9]]
+Example 2:
+
+Input: intervals = [[1,2],[3,5],[6,7],[8,10],[12,16]], newInterval = [4,8]
+Output: [[1,2],[3,10],[12,16]]
+Explanation: Because the new interval [4,8] overlaps with [3,5],[6,7],[8,10].
+
+```cpp
+class Solution {
+public:
+    vector<vector<int>> insert(vector<vector<int>>& intervals, vector<int>& newInterval) {
+        sort(intervals.begin(), intervals.end(), [](const auto& a, const auto& b) {
+            return a[0] == b[0] ? a[1] < b[1] : a[0] < b[0];
+        });
+        vector<vector<int>> res;
+        int s = -1, e = -1;
+        for (const auto& interval: intervals) {
+            if (interval[0] >= newInterval[0]) {
+                if (newInterval[0] > e) {
+                    if (s != -1) res.push_back({s, e});
+                    s = newInterval[0];
+                }
+                e = max(e, newInterval[1]);
+                // Avoid new interval being inserted twice
+                newInterval[0] = INT_MAX;
+            }
+            if (interval[0] > e) {
+                if (s != -1) res.push_back({s, e});
+                s = interval[0];
+            }
+            e = max(e, interval[1]);
+        }
+        if (newInterval[0] > e) {
+            if (s != -1) res.push_back({s, e});
+            if (newInterval[0] != INT_MAX) res.push_back(newInterval);
+        }
+        else res.push_back({s, max(e, newInterval[1])});
+        return res;
+    }
+};
+```
+
+#### 51. 452. Minimum Number of Arrows to Burst Balloons
+
+There are some spherical balloons taped onto a flat wall that represents the XY-plane. The balloons are represented as a 2D integer array points where points[i] = [xstart, xend] denotes a balloon whose horizontal diameter stretches between xstart and xend. You do not know the exact y-coordinates of the balloons.
+
+Arrows can be shot up directly vertically (in the positive y-direction) from different points along the x-axis. A balloon with xstart and xend is burst by an arrow shot at x if xstart <= x <= xend. There is no limit to the number of arrows that can be shot. A shot arrow keeps traveling up infinitely, bursting any balloons in its path.
+
+Given the array points, return the minimum number of arrows that must be shot to burst all balloons.
+ 
+
+Example 1:
+
+Input: points = [[10,16],[2,8],[1,6],[7,12]]
+Output: 2
+Explanation: The balloons can be burst by 2 arrows:
+- Shoot an arrow at x = 6, bursting the balloons [2,8] and [1,6].
+- Shoot an arrow at x = 11, bursting the balloons [10,16] and [7,12].
+Example 2:
+
+Input: points = [[1,2],[3,4],[5,6],[7,8]]
+Output: 4
+Explanation: One arrow needs to be shot for each balloon for a total of 4 arrows.
+Example 3:
+
+Input: points = [[1,2],[2,3],[3,4],[4,5]]
+Output: 2
+Explanation: The balloons can be burst by 2 arrows:
+- Shoot an arrow at x = 2, bursting the balloons [1,2] and [2,3].
+- Shoot an arrow at x = 4, bursting the balloons [3,4] and [4,5].
+
+```cpp
+class Solution {
+public:
+    int findMinArrowShots(vector<vector<int>>& points) {
+        // sort points with x_end as we have to use an arrow at the end of every 
+        // baloon row
+        sort(points.begin(), points.end(), [](const auto& a, const auto& b) {
+            return a[1] == b[1] ? a[0] < b[0] : a[1] < b[1];
+        });
+        int res = 0;
+        long long prev = LONG_LONG_MIN;
+        for (const auto& point: points) {
+            if (point[0] > prev) {
+                res++;
+                prev = point[1];
+            }
+        }
+        return res;
+    }
+};
+```
+
+#### 52. 20. Valid Parentheses
+
+Given a string s containing just the characters '(', ')', '{', '}', '[' and ']', determine if the input string is valid.
+
+An input string is valid if:
+
+Open brackets must be closed by the same type of brackets.
+Open brackets must be closed in the correct order.
+Every close bracket has a corresponding open bracket of the same type.
+ 
+
+Example 1:
+
+Input: s = "()"
+
+Output: true
+
+Example 2:
+
+Input: s = "()[]{}"
+
+Output: true
+
+Example 3:
+
+Input: s = "(]"
+
+Output: false
+
+Example 4:
+
+Input: s = "([])"
+
+Output: true
+
+```cpp
+class Solution {
+public:
+    bool isValid(string s) {
+        stack<char> st;
+        for (char cur : s) {
+            if (!st.empty()) {
+                char last = st.top();
+                if (isPair(last, cur)) {
+                    st.pop();
+                    continue;
+                }
+            }
+            st.push(cur);
+        }
+        return st.empty();
+    }
+
+private:
+    bool isPair(char last, char cur) {
+        return (last == '(' && cur == ')') || (last == '{' && cur == '}') ||
+               (last == '[' && cur == ']');
+    }
+};
+```
+
+#### 53. 71. Simplify Path
+
+You are given an absolute path for a Unix-style file system, which always begins with a slash '/'. Your task is to transform this absolute path into its simplified canonical path.
+
+The rules of a Unix-style file system are as follows:
+
+A single period '.' represents the current directory.
+A double period '..' represents the previous/parent directory.
+Multiple consecutive slashes such as '//' and '///' are treated as a single slash '/'.
+Any sequence of periods that does not match the rules above should be treated as a valid directory or file name. For example, '...' and '....' are valid directory or file names.
+The simplified canonical path should follow these rules:
+
+The path must start with a single slash '/'.
+Directories within the path must be separated by exactly one slash '/'.
+The path must not end with a slash '/', unless it is the root directory.
+The path must not have any single or double periods ('.' and '..') used to denote current or parent directories.
+Return the simplified canonical path.
+
+ 
+
+Example 1:
+
+Input: path = "/home/"
+
+Output: "/home"
+
+Explanation:
+
+The trailing slash should be removed.
+
+Example 2:
+
+Input: path = "/home//foo/"
+
+Output: "/home/foo"
+
+Explanation:
+
+Multiple consecutive slashes are replaced by a single one.
+
+Example 3:
+
+Input: path = "/home/user/Documents/../Pictures"
+
+Output: "/home/user/Pictures"
+
+Explanation:
+
+A double period ".." refers to the directory up a level (the parent directory).
+
+Example 4:
+
+Input: path = "/../"
+
+Output: "/"
+
+Explanation:
+
+Going one level up from the root directory is not possible.
+
+Example 5:
+
+Input: path = "/.../a/../b/c/../d/./"
+
+Output: "/.../b/d"
+
+Explanation:
+
+"..." is a valid name for a directory in this problem.
+
+```cpp
+class Solution {
+public:
+    string simplifyPath(string path) {
+        stack<string> st;
+        istringstream iss(path);
+        string word;
+        while (getline(iss, word, '/')) {
+            if (word == ".") continue;
+            if (word == "..") if (!st.empty()) st.pop();
+            if (!word.empty() && word != "..") st.push(word);
+        }
+        string res = "";
+        while (!st.empty()) {
+            string str = st.top();
+            // reverse every word so that at the end we can reverse the whole res
+            reverse(str.begin(), str.end());
+            res += str + "/";
+            st.pop();
+        }
+        reverse(res.begin(), res.end());
+        return res == "" ? "/" : res;
+    }
+};
+```
+
+#### 54. 155. Min Stack
+
+Design a stack that supports push, pop, top, and retrieving the minimum element in constant time.
+
+Implement the MinStack class:
+
+MinStack() initializes the stack object.
+void push(int val) pushes the element val onto the stack.
+void pop() removes the element on the top of the stack.
+int top() gets the top element of the stack.
+int getMin() retrieves the minimum element in the stack.
+You must implement a solution with O(1) time complexity for each function.
+ 
+
+Example 1:
+
+Input
+["MinStack","push","push","push","getMin","pop","top","getMin"]
+[[],[-2],[0],[-3],[],[],[],[]]
+
+Output
+[null,null,null,null,-3,null,0,-2]
+
+Explanation
+MinStack minStack = new MinStack();
+minStack.push(-2);
+minStack.push(0);
+minStack.push(-3);
+minStack.getMin(); // return -3
+minStack.pop();
+minStack.top();    // return 0
+minStack.getMin(); // return -2
+
+```cpp
+class MinStack {
+private:
+    stack<pair<int, int>> st;
+public:
+    MinStack() {
+        
+    }
+    
+    void push(int val) {
+        if (st.empty()) st.push({val, val});
+        else st.push({val, min(val, st.top().second)});
+    }
+    
+    void pop() {
+        st.pop();
+    }
+    
+    int top() {
+        return st.top().first;
+    }
+    
+    int getMin() {
+        return st.top().second;
+    }
+};
+
+/**
+ * Your MinStack object will be instantiated and called as such:
+ * MinStack* obj = new MinStack();
+ * obj->push(val);
+ * obj->pop();
+ * int param_3 = obj->top();
+ * int param_4 = obj->getMin();
+ */
+```
+
+#### 55. 150. Evaluate Reverse Polish Notation
+
+You are given an array of strings tokens that represents an arithmetic expression in a Reverse Polish Notation.
+
+Evaluate the expression. Return an integer that represents the value of the expression.
+
+Note that:
+
+The valid operators are '+', '-', '*', and '/'.
+Each operand may be an integer or another expression.
+The division between two integers always truncates toward zero.
+There will not be any division by zero.
+The input represents a valid arithmetic expression in a reverse polish notation.
+The answer and all the intermediate calculations can be represented in a 32-bit integer.
+ 
+
+Example 1:
+
+Input: tokens = ["2","1","+","3","*"]
+Output: 9
+Explanation: ((2 + 1) * 3) = 9
+Example 2:
+
+Input: tokens = ["4","13","5","/","+"]
+Output: 6
+Explanation: (4 + (13 / 5)) = 6
+Example 3:
+
+Input: tokens = ["10","6","9","3","+","-11","*","/","*","17","+","5","+"]
+Output: 22
+Explanation: ((10 * (6 / ((9 + 3) * -11))) + 17) + 5
+= ((10 * (6 / (12 * -11))) + 17) + 5
+= ((10 * (6 / -132)) + 17) + 5
+= ((10 * 0) + 17) + 5
+= (0 + 17) + 5
+= 17 + 5
+= 22
+
+```cpp
+class Solution {
+public:
+    int evalRPN(vector<string>& tokens) {
+        stack<int> st;
+        for (const auto& token: tokens) {
+            if (token == "+") {
+                int y = st.top();
+                st.pop();
+                int x = st.top();
+                st.pop();
+                st.push(x + y);
+            }
+            else if (token == "-") {
+                int y = st.top();
+                st.pop();
+                int x = st.top();
+                st.pop();
+                st.push(x - y);
+            }
+            else if (token == "*") {
+                int y = st.top();
+                st.pop();
+                int x = st.top();
+                st.pop();
+                st.push(x * y);
+            }
+            else if (token == "/") {
+                int y = st.top();
+                st.pop();
+                int x = st.top();
+                st.pop();
+                st.push(x / y);
+            }
+            else st.push(stoi(token));
+        }
+        return st.top();
+    }
+};
+```
