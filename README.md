@@ -3569,5 +3569,313 @@ Output: 2.50000
 Explanation: merged array = [1,2,3,4] and median is (2 + 3) / 2 = 2.5.
 
 ```cpp
+class Solution {
+public:
+    double findMedianSortedArrays(vector<int> &nums1, vector<int> &nums2) {
+        int n1 = nums1.size(), n2 = nums2.size();
+        
+        if (n1 > n2) return findMedianSortedArrays(nums2, nums1);
+        
+        int n = n1 + n2;
+        int left = (n1 + n2 + 1) / 2; 
+        int low = 0, high = n1;
+        
+        while (low <= high) {
+            int mid1 = (low + high) >> 1; 
+            int mid2 = left - mid1;
+            
+            int l1 = INT_MIN, l2 = INT_MIN, r1 = INT_MAX, r2 = INT_MAX;
+            
+            if (mid1 < n1)
+                r1 = nums1[mid1];
+            if (mid2 < n2)
+                r2 = nums2[mid2];
+            if (mid1 - 1 >= 0)
+                l1 = nums1[mid1 - 1];
+            if (mid2 - 1 >= 0)
+                l2 = nums2[mid2 - 1];
+            
+            if (l1 <= r2 && l2 <= r1) {
+                if (n % 2 == 1) return max(l1, l2);
+                else return ((double)(max(l1, l2) + min(r1, r2))) / 2.0;
+            }
+            else if (l1 > r2) {
+                high = mid1 - 1;
+            }
+            else {
+                low = mid1 + 1;
+            }
+        }
+        return 0; 
+    }
+};
 
+```
+
+
+#### 69. 215. Kth Largest Element in an Array
+
+Given an integer array nums and an integer k, return the kth largest element in the array.
+
+Note that it is the kth largest element in the sorted order, not the kth distinct element.
+
+Can you solve it without sorting?
+ 
+
+Example 1:
+
+Input: nums = [3,2,1,5,6,4], k = 2
+Output: 5
+Example 2:
+
+Input: nums = [3,2,3,1,2,4,5,5,6], k = 4
+Output: 4
+
+```cpp
+class Solution {
+public:
+    int findKthLargest(vector<int>& nums, int k) {
+        priority_queue<int, vector<int>, greater<int>> pq;
+        for (const auto& num: nums) {
+            pq.push(num);
+            while (pq.size() > k) pq.pop();
+        }
+        return pq.top();
+    }
+};
+```
+
+
+#### 70. 502. IPO
+
+Suppose LeetCode will start its IPO soon. In order to sell a good price of its shares to Venture Capital, LeetCode would like to work on some projects to increase its capital before the IPO. Since it has limited resources, it can only finish at most k distinct projects before the IPO. Help LeetCode design the best way to maximize its total capital after finishing at most k distinct projects.
+
+You are given n projects where the ith project has a pure profit profits[i] and a minimum capital of capital[i] is needed to start it.
+
+Initially, you have w capital. When you finish a project, you will obtain its pure profit and the profit will be added to your total capital.
+
+Pick a list of at most k distinct projects from given projects to maximize your final capital, and return the final maximized capital.
+
+The answer is guaranteed to fit in a 32-bit signed integer.
+
+
+Example 1:
+
+Input: k = 2, w = 0, profits = [1,2,3], capital = [0,1,1]
+Output: 4
+Explanation: Since your initial capital is 0, you can only start the project indexed 0.
+After finishing it you will obtain profit 1 and your capital becomes 1.
+With capital 1, you can either start the project indexed 1 or the project indexed 2.
+Since you can choose at most 2 projects, you need to finish the project indexed 2 to get the maximum capital.
+Therefore, output the final maximized capital, which is 0 + 1 + 3 = 4.
+Example 2:
+
+Input: k = 3, w = 0, profits = [1,2,3], capital = [0,1,2]
+Output: 6
+
+```cpp
+class Solution {
+public:
+    int findMaximizedCapital(int k, int w, vector<int>& profits, vector<int>& capital) {
+        int n = profits.size();
+        vector<pair<int, int>> projects;
+        for (int i = 0; i < n; ++i) {
+            projects.emplace_back(capital[i], profits[i]);
+        }
+        sort(projects.begin(), projects.end());
+
+        priority_queue<int> maxHeap;
+        for (int i = 0, j = 0; j < k; ++j) {
+            while (i < n && projects[i].first <= w) {
+                maxHeap.push(projects[i].second);
+                i++;
+            }
+            if (maxHeap.empty()) {
+                break;
+            }
+            w += maxHeap.top();
+            maxHeap.pop();
+        }
+        return w;
+    }
+};
+```
+
+#### 71. 373. Find K Pairs with Smallest Sums
+
+You are given two integer arrays nums1 and nums2 sorted in non-decreasing order and an integer k.
+
+Define a pair (u, v) which consists of one element from the first array and one element from the second array.
+
+Return the k pairs (u1, v1), (u2, v2), ..., (uk, vk) with the smallest sums.
+ 
+
+Example 1:
+
+Input: nums1 = [1,7,11], nums2 = [2,4,6], k = 3
+Output: [[1,2],[1,4],[1,6]]
+Explanation: The first 3 pairs are returned from the sequence: [1,2],[1,4],[1,6],[7,2],[7,4],[11,2],[7,6],[11,4],[11,6]
+Example 2:
+
+Input: nums1 = [1,1,2], nums2 = [1,2,3], k = 2
+Output: [[1,1],[1,1]]
+Explanation: The first 2 pairs are returned from the sequence: [1,1],[1,1],[1,2],[2,1],[1,2],[2,2],[1,3],[1,3],[2,3]
+
+```cpp
+class Solution {
+public:
+    vector<vector<int>> kSmallestPairs(vector<int>& nums1, vector<int>& nums2, int k) {
+        priority_queue<pair<int, pair<int, int>>> pq;
+        for (int i = 0; i < nums1.size(); i++) {
+            for (int j = 0; j < nums2.size(); j++) {
+                int sum = nums1[i] + nums2[j];
+                if (pq.size() < k) {
+                    pq.push({sum, {nums1[i], nums2[j]}});
+                } 
+                else if (sum < pq.top().first) {
+                    pq.pop();
+                    pq.push({sum, {nums1[i], nums2[j]}});
+                } 
+                else break;
+            }
+        }
+
+        vector<vector<int>> res;
+        while (!pq.empty()) {
+            res.push_back({pq.top().second.first, pq.top().second.second});
+            pq.pop();
+        }
+        reverse(res.begin(), res.end());
+        return res;
+    }
+};
+```
+
+
+#### 72. 295. Find Median from Data Stream
+
+The median is the middle value in an ordered integer list. If the size of the list is even, there is no middle value, and the median is the mean of the two middle values.
+
+For example, for arr = [2,3,4], the median is 3.
+For example, for arr = [2,3], the median is (2 + 3) / 2 = 2.5.
+Implement the MedianFinder class:
+
+MedianFinder() initializes the MedianFinder object.
+void addNum(int num) adds the integer num from the data stream to the data structure.
+double findMedian() returns the median of all elements so far. Answers within 10-5 of the actual answer will be accepted.
+ 
+
+Example 1:
+
+Input
+["MedianFinder", "addNum", "addNum", "findMedian", "addNum", "findMedian"]
+[[], [1], [2], [], [3], []]
+Output
+[null, null, null, 1.5, null, 2.0]
+
+Explanation
+MedianFinder medianFinder = new MedianFinder();
+medianFinder.addNum(1);    // arr = [1]
+medianFinder.addNum(2);    // arr = [1, 2]
+medianFinder.findMedian(); // return 1.5 (i.e., (1 + 2) / 2)
+medianFinder.addNum(3);    // arr[1, 2, 3]
+medianFinder.findMedian(); // return 2.0
+
+```cpp
+class MedianFinder {
+private:
+    priority_queue<int> left; 
+    priority_queue<int, vector<int>, greater<int>> right;
+public:
+    MedianFinder() {
+        
+    }
+    
+    void addNum(int num) {
+        left.push(num);
+        if (!right.empty()) {
+            while (left.top() > right.top()) {
+                int temp = left.top();
+                left.pop();
+                left.push(right.top());
+                right.pop();
+                right.push(temp);
+            }
+        }
+        while (left.size() > right.size()) {
+            right.push(left.top());
+            left.pop();
+        }
+    }
+    
+    double findMedian() {
+        if (right.size() > left.size()) return (double)right.top();
+        return ((double)left.top() + (double)right.top()) / 2.0;
+    }
+};
+
+/**
+ * Your MedianFinder object will be instantiated and called as such:
+ * MedianFinder* obj = new MedianFinder();
+ * obj->addNum(num);
+ * double param_2 = obj->findMedian();
+ */
+```
+
+#### 73. 224. Basic Calculator
+
+Given a string s representing a valid expression, implement a basic calculator to evaluate it, and return the result of the evaluation.
+
+Note: You are not allowed to use any built-in function which evaluates strings as mathematical expressions, such as eval().
+ 
+
+Example 1:
+
+Input: s = "1 + 1"
+Output: 2
+Example 2:
+
+Input: s = " 2-1 + 2 "
+Output: 3
+Example 3:
+
+Input: s = "(1+(4+5+2)-3)+(6+8)"
+Output: 23
+
+```cpp
+class Solution {
+public:
+    int calculate(string s) {
+        long long int sum = 0;
+        int sign = 1;
+        stack<pair<int,int>> st;
+
+        for(int i=0; i<s.size();i++){
+            if(isdigit(s[i])){
+                long long int num = 0;
+                while(i<s.size() && isdigit(s[i])){
+                    num = num * 10 + (s[i] - '0');
+                    i++;
+                }
+                i--;
+                sum += num * sign;
+                sign = 1;
+            }
+            else if(s[i] == '('){
+                st.push({sum, sign});
+                sum = 0;
+                sign = 1;
+            }
+            else if(s[i] == ')'){
+                sum = st.top().first + (st.top().second * sum);
+                st.pop();
+
+            }
+            else if(s[i] == '-'){
+                sign = -1 * sign;
+            }
+        }
+        return sum;
+    }
+};
 ```
