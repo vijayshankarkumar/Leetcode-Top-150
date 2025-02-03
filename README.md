@@ -3879,3 +3879,496 @@ public:
     }
 };
 ```
+
+#### 74. 17. Letter Combinations of a Phone Number
+
+Given a string containing digits from 2-9 inclusive, return all possible letter combinations that the number could represent. Return the answer in any order.
+
+A mapping of digits to letters (just like on the telephone buttons) is given below. Note that 1 does not map to any letters.
+ 
+
+Example 1:
+
+Input: digits = "23"
+Output: ["ad","ae","af","bd","be","bf","cd","ce","cf"]
+Example 2:
+
+Input: digits = ""
+Output: []
+Example 3:
+
+Input: digits = "2"
+Output: ["a","b","c"]
+
+```cpp
+class Solution {
+public:
+    void bt(int idx, string& curr, const string& digits, const vector<string>& mp, vector<string>& res) {
+        if (idx == digits.size()) {
+            res.push_back(curr);
+            return;
+        }
+
+        for (const auto& c: mp[digits[idx] - '0']) {
+            curr.push_back(c);
+            bt(idx + 1, curr, digits, mp, res);
+            curr.pop_back();
+        }
+    }
+
+    vector<string> letterCombinations(string digits) {
+        if (digits.empty()) return {};
+        vector<string> mp = {"", "", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz"};
+        vector<string> res;
+        string curr;
+        bt(0, curr, digits, mp, res);
+        return res;
+    }
+};
+```
+
+#### 75. 77. Combinations
+
+Given two integers n and k, return all possible combinations of k numbers chosen from the range [1, n].
+
+You may return the answer in any order.
+ 
+
+Example 1:
+
+Input: n = 4, k = 2
+Output: [[1,2],[1,3],[1,4],[2,3],[2,4],[3,4]]
+Explanation: There are 4 choose 2 = 6 total combinations.
+Note that combinations are unordered, i.e., [1,2] and [2,1] are considered to be the same combination.
+Example 2:
+
+Input: n = 1, k = 1
+Output: [[1]]
+Explanation: There is 1 choose 1 = 1 total combination. 
+
+```cpp
+class Solution {
+public:
+    void bt(int idx, int n, int k, vector<int>& curr, vector<vector<int>>& res) {
+        if (curr.size() == k) {
+            res.push_back(curr);
+            return;
+        }
+
+        for (int i = idx; i <= n; i++) {
+            curr.push_back(i);
+            bt(i + 1, n, k, curr, res);
+            curr.pop_back();
+        }
+    }
+
+    vector<vector<int>> combine(int n, int k) {
+        vector<vector<int>> res;
+        vector<int> curr;
+        bt(1, n, k, curr, res);
+        return res;
+    }
+};
+```
+
+#### 76. 46. Permutations
+
+Given an array nums of distinct integers, return all the possible 
+permutations
+. You can return the answer in any order.
+ 
+
+Example 1:
+
+Input: nums = [1,2,3]
+Output: [[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]
+Example 2:
+
+Input: nums = [0,1]
+Output: [[0,1],[1,0]]
+Example 3:
+
+Input: nums = [1]
+Output: [[1]]
+
+```cpp
+class Solution {
+public:
+    void bt(int idx, vector<int>& nums, vector<vector<int>>& res) {
+        if (idx == nums.size()) {
+            res.push_back(nums);
+            return;
+        }
+
+        for (int i = idx; i < nums.size(); i++) {
+            swap(nums[i], nums[idx]);
+            bt(idx + 1, nums, res); 
+            swap(nums[i], nums[idx]); 
+        }
+    }
+
+    vector<vector<int>> permute(vector<int>& nums) {
+        vector<vector<int>> res;
+        bt(0, nums, res);
+        return res;
+    }
+};
+
+```
+
+#### 77. 39. Combination Sum
+
+Given an array of distinct integers candidates and a target integer target, return a list of all unique combinations of candidates where the chosen numbers sum to target. You may return the combinations in any order.
+
+The same number may be chosen from candidates an unlimited number of times. Two combinations are unique if the 
+frequency
+ of at least one of the chosen numbers is different.
+
+The test cases are generated such that the number of unique combinations that sum up to target is less than 150 combinations for the given input.
+
+ 
+
+Example 1:
+
+Input: candidates = [2,3,6,7], target = 7
+Output: [[2,2,3],[7]]
+Explanation:
+2 and 3 are candidates, and 2 + 2 + 3 = 7. Note that 2 can be used multiple times.
+7 is a candidate, and 7 = 7.
+These are the only two combinations.
+Example 2:
+
+Input: candidates = [2,3,5], target = 8
+Output: [[2,2,2,2],[2,3,3],[3,5]]
+Example 3:
+
+Input: candidates = [2], target = 1
+Output: []
+
+```cpp
+class Solution {
+public:
+    void bt(int idx, int sum, vector<int>& curr, int target, const vector<int>& candidates, vector<vector<int>>& res) {
+        if (sum > target) return;
+        if (sum == target) {
+            res.push_back(curr);
+            return;
+        }
+
+        for (int i = idx; i < candidates.size(); i++) { 
+            curr.push_back(candidates[i]);
+            bt(i, sum + candidates[i], curr, target, candidates, res); 
+            curr.pop_back();
+        }
+    }
+
+    vector<vector<int>> combinationSum(vector<int>& candidates, int target) {
+        vector<vector<int>> res;
+        vector<int> curr;
+        bt(0, 0, curr, target, candidates, res);
+        return res;
+    }
+};
+
+```
+
+#### 78. 22. Generate Parentheses
+Solved
+Medium
+Topics
+Companies
+Given n pairs of parentheses, write a function to generate all combinations of well-formed parentheses.
+
+ 
+
+Example 1:
+
+Input: n = 3
+Output: ["((()))","(()())","(())()","()(())","()()()"]
+Example 2:
+
+Input: n = 1
+Output: ["()"]
+
+```cpp
+class Solution {
+public:
+    void bt(string& curr, int sum, int n, vector<string>& res) {
+        if (curr.size() == n) {
+            if (sum == 0) res.push_back(curr);
+            return;
+        }
+
+        curr.push_back('(');
+        bt(curr, sum + 1, n, res);
+        curr.pop_back();
+        if (sum > 0) {
+            curr.push_back(')');
+            bt(curr, sum - 1, n, res);
+            curr.pop_back();
+        }
+    }
+
+    vector<string> generateParenthesis(int n) {
+        vector<string> res;
+        int sum = 0;
+        string curr;
+        bt(curr, sum, 2 * n, res);
+        return res;
+    }
+};
+```
+
+#### 79. 79. Word Search
+
+Given an m x n grid of characters board and a string word, return true if word exists in the grid.
+
+The word can be constructed from letters of sequentially adjacent cells, where adjacent cells are horizontally or vertically neighboring. The same letter cell may not be used more than once.
+ 
+
+Example 1:
+
+
+Input: board = [["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]], word = "ABCCED"
+Output: true
+Example 2:
+
+
+Input: board = [["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]], word = "SEE"
+Output: true
+Example 3:
+
+
+Input: board = [["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]], word = "ABCB"
+Output: false
+
+```cpp
+class Solution {
+public:
+
+    vector<vector<int>> dir = {{-1, 0}, {0, -1}, {0, 1}, {1, 0}};
+
+    bool f(int r, int c, int idx, const vector<vector<char>>& board, const string& word, vector<vector<bool>>& vis) {
+        if (board[r][c] != word[idx]) return false;
+        if (idx == word.size() - 1) return true;
+        for (auto& d : dir) {
+            if (r + d[0] >= 0 && r + d[0] < board.size() && c + d[1] >=0 && c + d[1] < board[0].size() && !vis[r + d[0]][c + d[1]]) {
+                vis[r + d[0]][c + d[1]] = true;
+                if (f(r + d[0], c + d[1], idx + 1, board, word, vis)) return true;
+                vis[r + d[0]][c + d[1]] = false;
+            }
+        }
+        return false;
+    }
+
+    bool exist(vector<vector<char>>& board, string word) {
+        vector<vector<bool>> vis(board.size(), vector<bool>(board[0].size(), false));
+        for (int i = 0; i < board.size(); i++) for (int j = 0; j < board[0].size(); j++) {
+            vis[i][j] = true;
+            if (f(i, j, 0, board, word, vis)) return true;
+            vis[i][j] = false;
+        }
+        return false;
+    }
+};
+```
+
+#### 80. 52. N-Queens II
+
+The n-queens puzzle is the problem of placing n queens on an n x n chessboard such that no two queens attack each other.
+
+Given an integer n, return the number of distinct solutions to the n-queens puzzle.
+ 
+
+Example 1:
+
+
+Input: n = 4
+Output: 2
+Explanation: There are two distinct solutions to the 4-queens puzzle as shown.
+Example 2:
+
+Input: n = 1
+Output: 1
+
+```cpp
+class Solution {
+public:
+    int totalNQueens(int n) {
+        vector<bool> col(n), diag(2 * n - 1), anti_diag(2 * n - 1);
+        return solve(col, diag, anti_diag, 0);
+    }
+
+    int solve(vector<bool>& col, vector<bool>& diag, vector<bool>& anti_diag, int row) {
+        int n = size(col), count = 0;
+        if (row == n) return 1;
+        for (int column = 0; column < n; column++)
+            if (!col[column] && !diag[row + column] && !anti_diag[row - column + n - 1]) {
+                col[column] = diag[row + column] = anti_diag[row - column + n - 1] = true;
+                count += solve(col, diag, anti_diag, row + 1);
+                col[column] = diag[row + column] = anti_diag[row - column + n - 1] = false;
+            }
+        return count;
+    }
+};
+```
+
+#### 81. 70. Climbing Stairs
+
+You are climbing a staircase. It takes n steps to reach the top.
+
+Each time you can either climb 1 or 2 steps. In how many distinct ways can you climb to the top?
+
+
+Example 1:
+
+Input: n = 2
+Output: 2
+Explanation: There are two ways to climb to the top.
+1. 1 step + 1 step
+2. 2 steps
+Example 2:
+
+Input: n = 3
+Output: 3
+Explanation: There are three ways to climb to the top.
+1. 1 step + 1 step + 1 step
+2. 1 step + 2 steps
+3. 2 steps + 1 step
+
+```cpp
+class Solution {
+public:
+    int climbStairs(int n) {
+        if (n == 1) return 1;
+        if (n == 2) return 2;
+        int m = 2, prev = 1, curr = 2;
+        while (m < n) {
+            int temp = prev + curr;
+            prev = curr;
+            curr = temp;
+            m++;
+        }
+        return curr;
+    }
+};
+```
+
+#### 82. 198. House Robber
+
+You are a professional robber planning to rob houses along a street. Each house has a certain amount of money stashed, the only constraint stopping you from robbing each of them is that adjacent houses have security systems connected and it will automatically contact the police if two adjacent houses were broken into on the same night.
+
+Given an integer array nums representing the amount of money of each house, return the maximum amount of money you can rob tonight without alerting the police.
+
+ 
+
+Example 1:
+
+Input: nums = [1,2,3,1]
+Output: 4
+Explanation: Rob house 1 (money = 1) and then rob house 3 (money = 3).
+Total amount you can rob = 1 + 3 = 4.
+Example 2:
+
+Input: nums = [2,7,9,3,1]
+Output: 12
+Explanation: Rob house 1 (money = 2), rob house 3 (money = 9) and rob house 5 (money = 1).
+Total amount you can rob = 2 + 9 + 1 = 12.
+
+```cpp
+class Solution {
+public:
+    int rob(vector<int>& nums) {
+        // dp[i] = maximum money robbed upto ith house
+        vector<int> dp(nums.size());
+        for (int i = 0; i < nums.size(); i++) {
+            if (i == 0) dp[i] = nums[i];
+            else if (i == 1) dp[i] = max(nums[i], nums[i - 1]);
+            else dp[i] = max(nums[i] + dp[i - 2], dp[i - 1]);
+        }
+        return dp.back();
+    }
+};
+```
+
+#### 83. 139. Word Break
+
+Given a string s and a dictionary of strings wordDict, return true if s can be segmented into a space-separated sequence of one or more dictionary words.
+
+Note that the same word in the dictionary may be reused multiple times in the segmentation.
+ 
+
+Example 1:
+
+Input: s = "leetcode", wordDict = ["leet","code"]
+Output: true
+Explanation: Return true because "leetcode" can be segmented as "leet code".
+Example 2:
+
+Input: s = "applepenapple", wordDict = ["apple","pen"]
+Output: true
+Explanation: Return true because "applepenapple" can be segmented as "apple pen apple".
+Note that you are allowed to reuse a dictionary word.
+Example 3:
+
+Input: s = "catsandog", wordDict = ["cats","dog","sand","and","cat"]
+Output: false
+
+```cpp
+class Solution {
+public:
+    bool wordBreak(string s, vector<string>& wordDict) {
+        set<string> st(wordDict.begin(), wordDict.end());
+        vector<bool> dp(s.size());
+        for (int i = 0; i < s.size(); i++) {
+            for (int j = i; j >= 0; j--) {
+                if (st.find(s.substr(j, i - j + 1)) != st.end()) {
+                    dp[i] = dp[i] | (j == 0 ? true: dp[j - 1]);
+                }
+            }
+        }
+        return dp.back();
+    }
+};
+```
+
+#### 84. 322. Coin Change
+
+You are given an integer array coins representing coins of different denominations and an integer amount representing a total amount of money.
+
+Return the fewest number of coins that you need to make up that amount. If that amount of money cannot be made up by any combination of the coins, return -1.
+
+You may assume that you have an infinite number of each kind of coin.
+ 
+
+Example 1:
+
+Input: coins = [1,2,5], amount = 11
+Output: 3
+Explanation: 11 = 5 + 5 + 1
+Example 2:
+
+Input: coins = [2], amount = 3
+Output: -1
+Example 3:
+
+Input: coins = [1], amount = 0
+Output: 0
+
+```cpp
+class Solution {
+public:
+    int coinChange(vector<int>& coins, int amount) {
+        vector<long long> dp(amount + 1, INT_MAX);
+        dp[0] = 0;
+        for (int i = 1; i <= amount; i++) {
+            for (const auto& coin: coins) {
+                if (coin <= i) dp[i] = min(dp[i], dp[i - coin] + 1);
+            }
+        }
+        return dp.back() >= INT_MAX ? -1 : dp.back();
+    }
+};
+```
+
+#### 85. 
