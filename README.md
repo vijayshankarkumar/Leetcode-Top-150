@@ -3550,6 +3550,8 @@ public:
 };
 ```
 
+
+
 #### 68. 4. Median of Two Sorted Arrays
 
 Given two sorted arrays nums1 and nums2 of size m and n respectively, return the median of the two sorted arrays.
@@ -4371,4 +4373,116 @@ public:
 };
 ```
 
-#### 85. 
+#### 85. 300. Longest Increasing Subsequence
+
+Given an integer array nums, return the length of the longest strictly increasing 
+subsequence.
+ 
+
+Example 1:
+
+Input: nums = [10,9,2,5,3,7,101,18]
+Output: 4
+Explanation: The longest increasing subsequence is [2,3,7,101], therefore the length is 4.
+Example 2:
+
+Input: nums = [0,1,0,3,2,3]
+Output: 4
+Example 3:
+
+Input: nums = [7,7,7,7,7,7,7]
+Output: 1
+
+
+```cpp
+class Solution {
+public:
+    int lengthOfLIS(vector<int>& nums) {
+        // dp[i] = subsequence of i + 1 length with dp[i] as the last element
+        // in fact dp will be sorted
+        vector<int> dp;
+        for (const auto& num: nums) {
+            auto lb = lower_bound(dp.begin(), dp.end(), num);
+            if (lb == dp.end()) dp.push_back(num);
+            else if (*lb == num) continue;
+            else *lb = num;
+        }
+        return dp.size();
+    }
+};
+```
+
+#### 86. 120. Triangle
+
+Given a triangle array, return the minimum path sum from top to bottom.
+
+For each step, you may move to an adjacent number of the row below. More formally, if you are on index i on the current row, you may move to either index i or index i + 1 on the next row.
+ 
+
+Example 1:
+
+Input: triangle = [[2],[3,4],[6,5,7],[4,1,8,3]]
+Output: 11
+Explanation: The triangle looks like:
+   2
+  3 4
+ 6 5 7
+4 1 8 3
+The minimum path sum from top to bottom is 2 + 3 + 5 + 1 = 11 (underlined above).
+Example 2:
+
+Input: triangle = [[-10]]
+Output: -10
+
+```cpp
+class Solution {
+public:
+    int minimumTotal(vector<vector<int>>& triangle) {
+        for (int i = 1; i < triangle.size(); i++) {
+            for (int j = 0; j < triangle[i].size(); j++) {
+                if (j == 0) triangle[i][j] += triangle[i - 1][j];
+                else if (j == triangle[i].size() - 1) triangle[i][j] += triangle[i - 1][j - 1];
+                else triangle[i][j] += min(triangle[i - 1][j], triangle[i - 1][j - 1]);
+            }
+        }
+        return *min_element(triangle.back().begin(), triangle.back().end());
+    }
+};
+```
+
+#### 87. 64. Minimum Path Sum
+
+Given a m x n grid filled with non-negative numbers, find a path from top left to bottom right, which minimizes the sum of all numbers along its path.
+
+Note: You can only move either down or right at any point in time.
+ 
+
+Example 1:
+
+
+Input: grid = [[1,3,1],[1,5,1],[4,2,1]]
+Output: 7
+Explanation: Because the path 1 → 3 → 1 → 1 → 1 minimizes the sum.
+Example 2:
+
+Input: grid = [[1,2,3],[4,5,6]]
+Output: 12 
+
+```cpp
+class Solution {
+public:
+    int minPathSum(vector<vector<int>>& grid) {
+        for (int i = 0; i < grid.size(); i++) {
+            for (int j = 0; j < grid[0].size(); j++) {
+                if (i == 0 && j == 0) continue;
+                else if (i == 0) grid[i][j] += grid[i][j - 1];
+                else if (j == 0) grid[i][j] += grid[i - 1][j];
+                else grid[i][j] += min(grid[i][j - 1], grid[i - 1][j]);
+            }
+        }
+        return grid.back().back();
+    }
+};
+```
+
+#### 88. 
