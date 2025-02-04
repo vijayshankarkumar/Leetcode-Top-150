@@ -4485,4 +4485,399 @@ public:
 };
 ```
 
-#### 88. 
+#### 88. 63. Unique Paths II
+
+You are given an m x n integer array grid. There is a robot initially located at the top-left corner (i.e., grid[0][0]). The robot tries to move to the bottom-right corner (i.e., grid[m - 1][n - 1]). The robot can only move either down or right at any point in time.
+
+An obstacle and space are marked as 1 or 0 respectively in grid. A path that the robot takes cannot include any square that is an obstacle.
+
+Return the number of possible unique paths that the robot can take to reach the bottom-right corner.
+
+The testcases are generated so that the answer will be less than or equal to 2 * 109.
+ 
+
+Example 1:
+
+
+Input: obstacleGrid = [[0,0,0],[0,1,0],[0,0,0]]
+Output: 2
+Explanation: There is one obstacle in the middle of the 3x3 grid above.
+There are two ways to reach the bottom-right corner:
+1. Right -> Right -> Down -> Down
+2. Down -> Down -> Right -> Right
+Example 2:
+
+
+Input: obstacleGrid = [[0,1],[0,0]]
+Output: 1
+
+```cpp
+class Solution {
+public:
+    int uniquePathsWithObstacles(vector<vector<int>>& mat) {
+        vector<vector<int>> dp(mat.size(), vector<int>(mat[0].size()));
+        for (int i = 0; i < mat.size(); i++) {
+            for (int j = 0; j < mat[0].size(); j++) {
+                if (mat[i][j] == 0) {
+                    if (i == 0 && j == 0) dp[i][j] = 1;
+                    else if (i == 0) dp[i][j] = dp[i][j - 1];
+                    else if (j == 0) dp[i][j] = dp[i - 1][j];
+                    else dp[i][j] = dp[i - 1][j] + dp[i][j - 1];
+                }
+            }
+        }
+        return dp.back().back();
+    }
+};
+```
+
+#### 89. 5. Longest Palindromic Substring
+
+Given a string s, return the longest palindromic substring in s.
+
+
+Example 1:
+
+Input: s = "babad"
+Output: "bab"
+Explanation: "aba" is also a valid answer.
+Example 2:
+
+Input: s = "cbbd"
+Output: "bb"
+
+```cpp
+class Solution {
+public:
+    string longestPalindrome(string s) {
+        vector<vector<bool>> dp(s.size(), vector<bool>(s.size()));
+        for (int len = 1; len <= s.size(); len++) {
+            if (len == 1) {
+                for (int i = 0; i < s.size(); i++) {
+                    dp[i][i] = true;
+                }
+            }
+            else if (len == 2) {
+                for (int i = 0; i < s.size() - 1; i++) {
+                    dp[i][i + 1] = s[i] == s[i + 1];
+                }
+            }
+            else {
+                for (int i = 0; i <= s.size() - len; i++) {
+                    dp[i][i + len - 1] = dp[i + 1][i + len - 2] && s[i] == s[i + len - 1];
+                }
+            }
+        }
+        for (int len = s.size(); len >= 1; len--) {
+            for (int i = 0; i <= s.size() - len; i++) if (dp[i][i + len -1]) return s.substr(i, len);
+        }
+        return "";
+    }
+};
+```
+
+#### 90. 97. Interleaving String
+
+Given strings s1, s2, and s3, find whether s3 is formed by an interleaving of s1 and s2.
+
+An interleaving of two strings s and t is a configuration where s and t are divided into n and m 
+substrings
+ respectively, such that:
+
+s = s1 + s2 + ... + sn
+t = t1 + t2 + ... + tm
+|n - m| <= 1
+The interleaving is s1 + t1 + s2 + t2 + s3 + t3 + ... or t1 + s1 + t2 + s2 + t3 + s3 + ...
+Note: a + b is the concatenation of strings a and b.
+ 
+
+Example 1:
+
+
+Input: s1 = "aabcc", s2 = "dbbca", s3 = "aadbbcbcac"
+Output: true
+Explanation: One way to obtain s3 is:
+Split s1 into s1 = "aa" + "bc" + "c", and s2 into s2 = "dbbc" + "a".
+Interleaving the two splits, we get "aa" + "dbbc" + "bc" + "a" + "c" = "aadbbcbcac".
+Since s3 can be obtained by interleaving s1 and s2, we return true.
+Example 2:
+
+Input: s1 = "aabcc", s2 = "dbbca", s3 = "aadbbbaccc"
+Output: false
+Explanation: Notice how it is impossible to interleave s2 with any other string to obtain s3.
+Example 3:
+
+Input: s1 = "", s2 = "", s3 = ""
+Output: true
+
+```cpp
+class Solution {
+public:
+    bool isInterleave(string s1, string s2, string s3) {
+        // dp[i][j] represents whether the first i characters 
+        // of s1 and the first j characters of s2 can form the first i + j characters of s3
+        int m = s1.size(), n = s2.size();
+        if (m + n != s3.size()) return false;
+
+        vector<vector<bool>> dp(m + 1, vector<bool>(n + 1, false));
+        dp[0][0] = true;
+
+        for (int i = 1; i <= m; ++i) dp[i][0] = dp[i - 1][0] && s1[i - 1] == s3[i - 1];
+
+        for (int j = 1; j <= n; ++j) dp[0][j] = dp[0][j - 1] && s2[j - 1] == s3[j - 1];
+
+        for (int i = 1; i <= m; ++i) {
+            for (int j = 1; j <= n; ++j) {
+                dp[i][j] = (dp[i - 1][j] && s1[i - 1] == s3[i + j - 1]) ||
+                           (dp[i][j - 1] && s2[j - 1] == s3[i + j - 1]);
+            }
+        }
+
+        return dp[m][n];
+    }
+};
+```
+
+
+#### 91. 72. Edit Distance
+
+Given two strings word1 and word2, return the minimum number of operations required to convert word1 to word2.
+
+You have the following three operations permitted on a word:
+
+Insert a character
+Delete a character
+Replace a character
+ 
+
+Example 1:
+
+Input: word1 = "horse", word2 = "ros"
+Output: 3
+Explanation: 
+horse -> rorse (replace 'h' with 'r')
+rorse -> rose (remove 'r')
+rose -> ros (remove 'e')
+Example 2:
+
+Input: word1 = "intention", word2 = "execution"
+Output: 5
+Explanation: 
+intention -> inention (remove 't')
+inention -> enention (replace 'i' with 'e')
+enention -> exention (replace 'n' with 'x')
+exention -> exection (replace 'n' with 'c')
+exection -> execution (insert 'u')
+
+```cpp
+class Solution {
+public:
+    int minDistance(string word1, string word2) {
+        const int m = word1.length();
+        const int n = word2.length();
+        // dp[i][j] := min # of operations to convert word1[0..i) to word2[0..j)
+        vector<vector<int>> dp(m + 1, vector<int>(n + 1));
+
+        for (int i = 1; i <= m; ++i)
+            dp[i][0] = i;
+
+        for (int j = 1; j <= n; ++j)
+            dp[0][j] = j;
+
+        for (int i = 1; i <= m; ++i)
+            for (int j = 1; j <= n; ++j)
+                if (word1[i - 1] == word2[j - 1]) // same characters
+                    dp[i][j] = dp[i - 1][j - 1];  // no operation
+                else
+                    dp[i][j] =
+                        min({dp[i - 1][j - 1], dp[i - 1][j], dp[i][j - 1]}) + 1;
+                              // replace       //delete        //insert
+        return dp[m][n];
+    }
+};
+```
+
+#### 92. 141. Linked List Cycle
+
+Given head, the head of a linked list, determine if the linked list has a cycle in it.
+
+There is a cycle in a linked list if there is some node in the list that can be reached again by continuously following the next pointer. Internally, pos is used to denote the index of the node that tail's next pointer is connected to. Note that pos is not passed as a parameter.
+
+Return true if there is a cycle in the linked list. Otherwise, return false.
+ 
+
+Example 1:
+
+
+Input: head = [3,2,0,-4], pos = 1
+Output: true
+Explanation: There is a cycle in the linked list, where the tail connects to the 1st node (0-indexed).
+Example 2:
+
+
+Input: head = [1,2], pos = 0
+Output: true
+Explanation: There is a cycle in the linked list, where the tail connects to the 0th node.
+Example 3:
+
+
+Input: head = [1], pos = -1
+Output: false
+Explanation: There is no cycle in the linked list.
+
+```cpp
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode(int x) : val(x), next(NULL) {}
+ * };
+ */
+class Solution {
+public:
+    bool hasCycle(ListNode *head) {
+        ListNode* slow = head, *fast = head;
+        while (fast != nullptr && fast->next != nullptr && fast->next->next != nullptr) {
+            if (slow == fast) return true;
+            slow = slow->next;
+            fast = fast->next;
+        }
+        return false;
+    }
+};
+```
+
+#### 93. 200. Number of Islands
+
+Given an m x n 2D binary grid grid which represents a map of '1's (land) and '0's (water), return the number of islands.
+
+An island is surrounded by water and is formed by connecting adjacent lands horizontally or vertically. You may assume all four edges of the grid are all surrounded by water.
+
+
+Example 1:
+
+Input: grid = [
+  ["1","1","1","1","0"],
+  ["1","1","0","1","0"],
+  ["1","1","0","0","0"],
+  ["0","0","0","0","0"]
+]
+Output: 1
+Example 2:
+
+Input: grid = [
+  ["1","1","0","0","0"],
+  ["1","1","0","0","0"],
+  ["0","0","1","0","0"],
+  ["0","0","0","1","1"]
+]
+Output: 3
+
+```cpp
+class Solution {
+public:
+    void dfs(int r, int c, vector<vector<char>>& grid) {
+        if (r < 0 || c < 0 || r == grid.size() || c == grid[0].size()) return;
+        if (grid[r][c] == '0' || grid[r][c] == '2') return;
+        grid[r][c] = '2';
+        vector<vector<int>> dir = { {0, 1}, {1, 0}, {-1, 0}, {0, -1} };
+        for (const auto& d: dir) dfs(r + d[0], c + d[1], grid);
+    }
+
+    int numIslands(vector<vector<char>>& grid) {
+        int res = 0;
+        for (int i = 0; i < grid.size(); i++) {
+            for (int j = 0; j < grid[0].size(); j++) {
+                if (grid[i][j] == '1') {
+                    res++;
+                    dfs(i, j, grid);
+                }
+            }
+        }
+        return res;
+    }
+};
+```
+
+#### 94. 130. Surrounded Regions
+
+You are given an m x n matrix board containing letters 'X' and 'O', capture regions that are surrounded:
+
+Connect: A cell is connected to adjacent cells horizontally or vertically.
+Region: To form a region connect every 'O' cell.
+Surround: The region is surrounded with 'X' cells if you can connect the region with 'X' cells and none of the region cells are on the edge of the board.
+To capture a surrounded region, replace all 'O's with 'X's in-place within the original board. You do not need to return anything.
+ 
+
+Example 1:
+
+Input: board = [["X","X","X","X"],["X","O","O","X"],["X","X","O","X"],["X","O","X","X"]]
+
+Output: [["X","X","X","X"],["X","X","X","X"],["X","X","X","X"],["X","O","X","X"]]
+
+Explanation:
+
+
+In the above diagram, the bottom region is not captured because it is on the edge of the board and cannot be surrounded.
+
+Example 2:
+
+Input: board = [["X"]]
+
+Output: [["X"]]
+
+```cpp
+
+class Solution {
+public:
+
+    void bfs(queue<vector<int>> q, vector<vector<char>> &arr){
+        vector<vector<int>> dir = {{0,1},{0,-1},{-1,0},{1,0}};
+        int n = arr.size();
+        int m = arr[0].size();
+
+        while(q.size()!=0){
+            vector<int> a = q.front();
+            q.pop();
+            int i = a[0];
+            int j = a[1];
+            arr[i][j]='Y';
+
+            for(int k=0; k<4; k++){
+                int nr = i+dir[k][0];
+                int nc = j+dir[k][1];
+
+                if(nr>=0 && nc>=0 && nr<n && nc<m && arr[nr][nc]=='O'){
+                    arr[nr][nc]='Y';
+                    q.push({nr,nc});
+                }
+            }
+        }
+    }
+    void solve(vector<vector<char>>& arr) {
+        int n = arr.size();
+        int m = arr[0].size();
+        queue<vector<int>> q;
+        for(int i=0; i<n; i++){
+            if(arr[i][0]=='O'){
+                q.push({i,0});
+            }
+            if(arr[i][m-1]=='O'){
+                q.push({i,m-1});
+            }
+        }
+        for(int j=1; j<m-1; j++){
+            if(arr[0][j]=='O') q.push({0,j});
+            if(arr[n-1][j]=='O') q.push({n-1,j});
+        }
+        bfs(q,arr);
+        for(int i=0; i<n; i++){
+            for(int j=0; j<m; j++){
+                if(arr[i][j]=='Y') arr[i][j]='O';
+                else if(arr[i][j]=='O') arr[i][j] = 'X';
+            }
+        }
+    }
+};
+```
