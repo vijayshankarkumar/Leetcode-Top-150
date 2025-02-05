@@ -5085,4 +5085,808 @@ public:
 };
 ```
 
-#### 98. 
+#### 98. 399. Evaluate Division
+
+You are given an array of variable pairs equations and an array of real numbers values, where equations[i] = [Ai, Bi] and values[i] represent the equation Ai / Bi = values[i]. Each Ai or Bi is a string that represents a single variable.
+
+You are also given some queries, where queries[j] = [Cj, Dj] represents the jth query where you must find the answer for Cj / Dj = ?.
+
+Return the answers to all queries. If a single answer cannot be determined, return -1.0.
+
+Note: The input is always valid. You may assume that evaluating the queries will not result in division by zero and that there is no contradiction.
+
+Note: The variables that do not occur in the list of equations are undefined, so the answer cannot be determined for them.
+ 
+
+Example 1:
+
+Input: equations = [["a","b"],["b","c"]], values = [2.0,3.0], queries = [["a","c"],["b","a"],["a","e"],["a","a"],["x","x"]]
+Output: [6.00000,0.50000,-1.00000,1.00000,-1.00000]
+Explanation: 
+Given: a / b = 2.0, b / c = 3.0
+queries are: a / c = ?, b / a = ?, a / e = ?, a / a = ?, x / x = ? 
+return: [6.0, 0.5, -1.0, 1.0, -1.0 ]
+note: x is undefined => -1.0
+Example 2:
+
+Input: equations = [["a","b"],["b","c"],["bc","cd"]], values = [1.5,2.5,5.0], queries = [["a","c"],["c","b"],["bc","cd"],["cd","bc"]]
+Output: [3.75000,0.40000,5.00000,0.20000]
+Example 3:
+
+Input: equations = [["a","b"]], values = [0.5], queries = [["a","b"],["b","a"],["a","c"],["x","y"]]
+Output: [0.50000,2.00000,-1.00000,-1.00000]
+
+```cpp
+class Solution {
+public:
+
+    void dfs(string node, string& dest, unordered_map<string, unordered_map<string, double>>& gr, unordered_set<string>& vis, double& ans, double temp) {
+        if(vis.find(node) != vis.end()) return;
+
+        vis.insert(node);
+        if(node == dest){
+            ans = temp;
+            return;
+        }
+
+        for(auto ne : gr[node]){
+            dfs(ne.first, dest, gr, vis, ans, temp * ne.second);
+        }
+    }
+
+    unordered_map<string, unordered_map<string, double>> buildGraph(const vector<vector<string>>& equations, const vector<double>& values) {
+        unordered_map<string, unordered_map<string, double>> gr;
+
+        for (int i = 0; i < equations.size(); i++) {
+            string dividend = equations[i][0];
+            string divisor = equations[i][1];
+            double value = values[i];
+
+            gr[dividend][divisor] = value;
+            gr[divisor][dividend] = 1.0 / value;
+        }
+
+        return gr;
+    }
+
+    vector<double> calcEquation(vector<vector<string>>& equations, vector<double>& values, vector<vector<string>>& queries) {
+        unordered_map<string, unordered_map<string, double>> gr = buildGraph(equations, values);
+        vector<double> finalAns;
+
+        for (auto query : queries) {
+            string dividend = query[0];
+            string divisor = query[1];
+
+            if (gr.find(dividend) == gr.end() || gr.find(divisor) == gr.end()) {
+                finalAns.push_back(-1.0);
+            } else {
+                unordered_set<string> vis;
+                double ans = -1, temp=1.0;
+                dfs(dividend, divisor, gr, vis, ans, temp);
+                finalAns.push_back(ans);
+            }
+        }
+
+        return finalAns;
+    }
+};
+```
+
+
+#### 99. 104. Maximum Depth of Binary Tree
+
+Given the root of a binary tree, return its maximum depth.
+
+A binary tree's maximum depth is the number of nodes along the longest path from the root node down to the farthest leaf node.
+ 
+
+Example 1:
+
+Input: root = [3,9,20,null,null,15,7]
+Output: 3
+Example 2:
+
+Input: root = [1,null,2]
+Output: 2
+
+```cpp
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    int maxDepth(TreeNode* root) {
+        if (root == nullptr) return 0;
+        return 1 + max(maxDepth(root->left), maxDepth(root->right));
+    }
+};
+```
+
+#### 100. 100. Same Tree
+
+Given the roots of two binary trees p and q, write a function to check if they are the same or not.
+
+Two binary trees are considered the same if they are structurally identical, and the nodes have the same value.
+ 
+
+Example 1:
+
+
+Input: p = [1,2,3], q = [1,2,3]
+Output: true
+Example 2:
+
+
+Input: p = [1,2], q = [1,null,2]
+Output: false
+Example 3:
+
+
+Input: p = [1,2,1], q = [1,1,2]
+Output: false
+
+```cpp
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    bool isSameTree(TreeNode* p, TreeNode* q) {
+        if (p == nullptr && q == nullptr) return true;
+        if (p == nullptr || q == nullptr) return false;
+        return p->val == q->val && isSameTree(p->left, q->left) && isSameTree(p->right, q->right); 
+    }
+};
+```
+
+#### 101. 226. Invert Binary Tree
+
+Given the root of a binary tree, invert the tree, and return its root.
+ 
+
+Example 1:
+
+
+Input: root = [4,2,7,1,3,6,9]
+Output: [4,7,2,9,6,3,1]
+Example 2:
+
+
+Input: root = [2,1,3]
+Output: [2,3,1]
+Example 3:
+
+Input: root = []
+Output: []
+
+```cpp
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    TreeNode* invertTree(TreeNode* root) {
+        if (root == nullptr) return root;
+        auto l = invertTree(root->left);
+        auto r = invertTree(root->right);
+        root->left = r;
+        root->right = l;
+        return root;
+    }
+};
+```
+
+#### 102. 101. Symmetric Tree
+
+Given the root of a binary tree, check whether it is a mirror of itself (i.e., symmetric around its center).
+
+
+Example 1:
+
+
+Input: root = [1,2,2,3,4,4,3]
+Output: true
+Example 2:
+
+
+Input: root = [1,2,2,null,3,null,3]
+Output: false
+
+```cpp
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    bool symmetric(TreeNode* left, TreeNode* right) {
+        if (left == nullptr && right == nullptr) return true;
+        if (left == nullptr || right == nullptr) return false;
+        return left->val == right->val && 
+               symmetric(left->left, right->right) && 
+               symmetric(left->right, right->left);
+    }
+
+    bool isSymmetric(TreeNode* root) {
+        return symmetric(root, root);
+    }
+};
+```
+
+#### 103. 105. Construct Binary Tree from Preorder and Inorder Traversal
+
+Given two integer arrays preorder and inorder where preorder is the preorder traversal of a binary tree and inorder is the inorder traversal of the same tree, construct and return the binary tree.
+ 
+
+Example 1:
+
+
+Input: preorder = [3,9,20,15,7], inorder = [9,3,15,20,7]
+Output: [3,9,20,null,null,15,7]
+Example 2:
+
+Input: preorder = [-1], inorder = [-1]
+Output: [-1]
+
+```cpp
+class Solution {
+public:
+    TreeNode* constructTree(vector<int>& preorder, int preStart, int preEnd,
+                            vector<int>& inorder, int inStart, int inEnd,
+                            map<int, int>& mp) {
+        if (preStart > preEnd || inStart > inEnd)
+            return NULL;
+
+        TreeNode* root = new TreeNode(preorder[preStart]);
+        int elem = mp[root->val];
+        int nElem = elem - inStart;
+
+        root->left = constructTree(preorder, preStart + 1, preStart + nElem,
+                                   inorder, inStart, elem - 1, mp);
+        root->right = constructTree(preorder, preStart + nElem + 1, preEnd,
+                                    inorder, elem + 1, inEnd, mp);
+
+        return root;
+    }
+
+    TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) {
+        int preStart = 0, preEnd = preorder.size() - 1;
+        int inStart = 0, inEnd = inorder.size() - 1;
+
+        map<int, int> mp;
+        for (int i = inStart; i <= inEnd; i++) {
+            mp[inorder[i]] = i;
+        }
+
+        return constructTree(preorder, preStart, preEnd, inorder, inStart, inEnd, mp);
+    }
+};
+```
+
+#### 104. 106. Construct Binary Tree from Inorder and Postorder Traversal
+
+Given two integer arrays inorder and postorder where inorder is the inorder traversal of a binary tree and postorder is the postorder traversal of the same tree, construct and return the binary tree.
+ 
+
+Example 1:
+
+
+Input: inorder = [9,3,15,20,7], postorder = [9,15,7,20,3]
+Output: [3,9,20,null,null,15,7]
+Example 2:
+
+Input: inorder = [-1], postorder = [-1]
+Output: [-1]
+
+```cpp
+class Solution {
+public:
+    TreeNode *Tree(vector<int>& in, int x, int y,vector<int>& po,int a,int b){
+        if(x > y || a > b)return nullptr;
+        TreeNode *node = new TreeNode(po[b]);
+        int SI = x;  
+        while(node->val != in[SI])SI++;
+        node->left  = Tree(in, x, SI - 1, po, a, a + SI - x - 1);
+        node->right = Tree(in, SI + 1, y, po, a + SI - x, b - 1);
+        return node;
+    }
+    TreeNode* buildTree(vector<int>& in, vector<int>& po){
+        return Tree(in, 0, in.size() - 1, po, 0, po.size() - 1);
+    }
+};
+```
+
+#### 105. 117. Populating Next Right Pointers in Each Node II
+
+Given a binary tree
+
+struct Node {
+  int val;
+  Node *left;
+  Node *right;
+  Node *next;
+}
+Populate each next pointer to point to its next right node. If there is no next right node, the next pointer should be set to NULL.
+
+Initially, all next pointers are set to NULL.
+ 
+
+Example 1:
+
+
+Input: root = [1,2,3,4,5,null,7]
+Output: [1,#,2,3,#,4,5,7,#]
+Explanation: Given the above binary tree (Figure A), your function should populate each next pointer to point to its next right node, just like in Figure B. The serialized output is in level order as connected by the next pointers, with '#' signifying the end of each level.
+Example 2:
+
+Input: root = []
+Output: []
+
+```cpp
+/*
+// Definition for a Node.
+class Node {
+public:
+    int val;
+    Node* left;
+    Node* right;
+    Node* next;
+
+    Node() : val(0), left(NULL), right(NULL), next(NULL) {}
+
+    Node(int _val) : val(_val), left(NULL), right(NULL), next(NULL) {}
+
+    Node(int _val, Node* _left, Node* _right, Node* _next)
+        : val(_val), left(_left), right(_right), next(_next) {}
+};
+*/
+
+class Solution {
+public:
+    Node* connect(Node* root) {
+        if (root == nullptr) return nullptr;
+        queue<Node*> q;
+        q.push(root);
+        while (!q.empty()) {
+            int sz = q.size();
+            for (int i = 0; i < sz; i++) {
+                Node* node = q.front();
+                q.pop();
+                if (i < sz - 1) node->next = q.front();
+                if (node->left) q.push(node->left);
+                if (node->right) q.push(node->right);
+            }
+        }
+        return root;
+    }
+};
+```
+
+#### 106. 114. Flatten Binary Tree to Linked List
+
+Given the root of a binary tree, flatten the tree into a "linked list":
+
+The "linked list" should use the same TreeNode class where the right child pointer points to the next node in the list and the left child pointer is always null.
+The "linked list" should be in the same order as a pre-order traversal of the binary tree.
+ 
+
+Example 1:
+
+Input: root = [1,2,5,3,4,null,6]
+Output: [1,null,2,null,3,null,4,null,5,null,6]
+Example 2:
+
+Input: root = []
+Output: []
+Example 3:
+
+Input: root = [0]
+Output: [0]
+
+```cpp
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+
+    pair<TreeNode*, TreeNode*> dfs(TreeNode* root) {
+        if (root == nullptr) return {nullptr, nullptr};
+        auto [sl, el] = dfs(root->left);
+        auto [sr, er] = dfs(root->right);
+        if (sl == nullptr && sr == nullptr) return {root, root};
+        if (sl) {
+            root->right = sl;
+            if (sr) el->right = sr; 
+        }
+        root->left = nullptr;
+        return {root, sr ? er : el};
+    }
+
+    void flatten(TreeNode* root) {
+        dfs(root);
+    }
+};
+```
+
+#### 107. 112. Path Sum
+
+Given the root of a binary tree and an integer targetSum, return true if the tree has a root-to-leaf path such that adding up all the values along the path equals targetSum.
+
+A leaf is a node with no children.
+ 
+
+Example 1:
+
+
+Input: root = [5,4,8,11,null,13,4,7,2,null,null,null,1], targetSum = 22
+Output: true
+Explanation: The root-to-leaf path with the target sum is shown.
+Example 2:
+
+
+Input: root = [1,2,3], targetSum = 5
+Output: false
+Explanation: There are two root-to-leaf paths in the tree:
+(1 --> 2): The sum is 3.
+(1 --> 3): The sum is 4.
+There is no root-to-leaf path with sum = 5.
+Example 3:
+
+Input: root = [], targetSum = 0
+Output: false
+Explanation: Since the tree is empty, there are no root-to-leaf paths.
+
+```cpp
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    bool hasPathSum(TreeNode* root, int targetSum, int sum = 0) {
+        if (root == nullptr) return false;
+        if (root->left == nullptr && root->right == nullptr) return sum + root->val == targetSum;
+        if (root->left == nullptr) return hasPathSum(root->right, targetSum, sum + root->val);
+        if (root->right == nullptr) return hasPathSum(root->left, targetSum, sum + root->val);
+        return hasPathSum(root->left, targetSum, sum + root->val) || 
+               hasPathSum(root->right, targetSum, sum + root->val);
+    }
+};
+```
+
+#### 108. 129. Sum Root to Leaf Numbers
+
+You are given the root of a binary tree containing digits from 0 to 9 only.
+
+Each root-to-leaf path in the tree represents a number.
+
+For example, the root-to-leaf path 1 -> 2 -> 3 represents the number 123.
+Return the total sum of all root-to-leaf numbers. Test cases are generated so that the answer will fit in a 32-bit integer.
+
+A leaf node is a node with no children.
+
+
+Example 1:
+
+
+Input: root = [1,2,3]
+Output: 25
+Explanation:
+The root-to-leaf path 1->2 represents the number 12.
+The root-to-leaf path 1->3 represents the number 13.
+Therefore, sum = 12 + 13 = 25.
+Example 2:
+
+
+Input: root = [4,9,0,5,1]
+Output: 1026
+Explanation:
+The root-to-leaf path 4->9->5 represents the number 495.
+The root-to-leaf path 4->9->1 represents the number 491.
+The root-to-leaf path 4->0 represents the number 40.
+Therefore, sum = 495 + 491 + 40 = 1026.
+
+```cpp
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    void dfs(TreeNode* root, int curr, int& sum) {
+        if (root->left == nullptr && root->right == nullptr) {
+            sum += curr * 10 + root->val;
+            return;
+        }
+        if (root->left != nullptr) dfs(root->left, curr * 10 + root->val, sum);
+        if (root->right != nullptr) dfs(root->right, curr * 10 + root->val, sum);
+    }
+
+    int sumNumbers(TreeNode* root) {
+        int curr = 0, sum = 0;
+        dfs(root, curr, sum);
+        return sum;
+    }
+};
+```
+
+#### 109. 124. Binary Tree Maximum Path Sum
+
+A path in a binary tree is a sequence of nodes where each pair of adjacent nodes in the sequence has an edge connecting them. A node can only appear in the sequence at most once. Note that the path does not need to pass through the root.
+
+The path sum of a path is the sum of the node's values in the path.
+
+Given the root of a binary tree, return the maximum path sum of any non-empty path.
+ 
+
+Example 1:
+
+
+Input: root = [1,2,3]
+Output: 6
+Explanation: The optimal path is 2 -> 1 -> 3 with a path sum of 2 + 1 + 3 = 6.
+Example 2:
+
+
+Input: root = [-10,9,20,null,null,15,7]
+Output: 42
+Explanation: The optimal path is 15 -> 20 -> 7 with a path sum of 15 + 20 + 7 = 42
+
+```cpp
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+
+    int f(TreeNode* root, int& res) {
+        if (root == nullptr) return 0;
+        int l = max(0, f(root->left, res));
+        int r = max(0, f(root->right, res));
+        res = max(res, root->val + l + r);
+        return root->val + max(l, r);
+    }
+
+    int maxPathSum(TreeNode* root) {
+        int res = -1e9;
+        f(root, res);
+        return res;
+    }
+};
+```
+
+#### 110. 173. Binary Search Tree Iterator
+
+Implement the BSTIterator class that represents an iterator over the in-order traversal of a binary search tree (BST):
+
+BSTIterator(TreeNode root) Initializes an object of the BSTIterator class. The root of the BST is given as part of the constructor. The pointer should be initialized to a non-existent number smaller than any element in the BST.
+boolean hasNext() Returns true if there exists a number in the traversal to the right of the pointer, otherwise returns false.
+int next() Moves the pointer to the right, then returns the number at the pointer.
+Notice that by initializing the pointer to a non-existent smallest number, the first call to next() will return the smallest element in the BST.
+
+You may assume that next() calls will always be valid. That is, there will be at least a next number in the in-order traversal when next() is called.
+
+ 
+
+Example 1:
+
+
+Input
+["BSTIterator", "next", "next", "hasNext", "next", "hasNext", "next", "hasNext", "next", "hasNext"]
+[[[7, 3, 15, null, null, 9, 20]], [], [], [], [], [], [], [], [], []]
+Output
+[null, 3, 7, true, 9, true, 15, true, 20, false]
+
+Explanation
+BSTIterator bSTIterator = new BSTIterator([7, 3, 15, null, null, 9, 20]);
+bSTIterator.next();    // return 3
+bSTIterator.next();    // return 7
+bSTIterator.hasNext(); // return True
+bSTIterator.next();    // return 9
+bSTIterator.hasNext(); // return True
+bSTIterator.next();    // return 15
+bSTIterator.hasNext(); // return True
+bSTIterator.next();    // return 20
+bSTIterator.hasNext(); // return False
+
+
+```cpp
+class BSTIterator {
+    stack<TreeNode *> myStack;
+public:
+    BSTIterator(TreeNode *root) {
+        pushAll(root);
+    }
+
+    /** @return whether we have a next smallest number */
+    bool hasNext() {
+        return !myStack.empty();
+    }
+
+    /** @return the next smallest number */
+    int next() {
+        TreeNode *tmpNode = myStack.top();
+        myStack.pop();
+        pushAll(tmpNode->right);
+        return tmpNode->val;
+    }
+
+private:
+    void pushAll(TreeNode *node) {
+        for (; node != NULL; myStack.push(node), node = node->left);
+    }
+};
+```
+
+#### 111. 222. Count Complete Tree Nodes
+
+Given the root of a complete binary tree, return the number of the nodes in the tree.
+
+According to Wikipedia, every level, except possibly the last, is completely filled in a complete binary tree, and all nodes in the last level are as far left as possible. It can have between 1 and 2h nodes inclusive at the last level h.
+
+Design an algorithm that runs in less than O(n) time complexity.
+ 
+
+Example 1:
+
+
+Input: root = [1,2,3,4,5,6]
+Output: 6
+Example 2:
+
+Input: root = []
+Output: 0
+Example 3:
+
+Input: root = [1]
+Output: 1
+
+```cpp
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    int countNodes(TreeNode* root) {
+        if (root == nullptr) return 0;
+        return 1 + countNodes(root->left) + countNodes(root->right);
+    }
+};
+```
+
+#### 112. 236. Lowest Common Ancestor of a Binary Tree
+
+Given a binary tree, find the lowest common ancestor (LCA) of two given nodes in the tree.
+
+According to the definition of LCA on Wikipedia: “The lowest common ancestor is defined between two nodes p and q as the lowest node in T that has both p and q as descendants (where we allow a node to be a descendant of itself).”
+ 
+
+Example 1:
+
+
+Input: root = [3,5,1,6,2,0,8,null,null,7,4], p = 5, q = 1
+Output: 3
+Explanation: The LCA of nodes 5 and 1 is 3.
+Example 2:
+
+
+Input: root = [3,5,1,6,2,0,8,null,null,7,4], p = 5, q = 4
+Output: 5
+Explanation: The LCA of nodes 5 and 4 is 5, since a node can be a descendant of itself according to the LCA definition.
+Example 3:
+
+Input: root = [1,2], p = 1, q = 2
+Output: 1
+
+```cpp
+if(root == null || root.val == p.val || root.val == q.val){
+            return root;
+        }
+        TreeNode left = lowestCommonAncestor(root.left, p, q);
+        TreeNode right = lowestCommonAncestor(root.right, p, q);
+        return ((left != null) ? ((right != null) ? root : left) : right);
+```
+
+#### 113. 530. Minimum Absolute Difference in BST
+
+Given the root of a Binary Search Tree (BST), return the minimum absolute difference between the values of any two different nodes in the tree.
+ 
+
+Example 1:
+
+
+Input: root = [4,2,6,1,3]
+Output: 1
+Example 2:
+
+
+Input: root = [1,0,48,null,null,12,49]
+Output: 1 
+
+```cpp
+class Solution {
+public:
+    int diff = INT_MAX;
+    TreeNode *prev = NULL;
+    void dfs(TreeNode *root) {
+        if (root->left) dfs(root->left);
+        if (prev) diff = min(diff, abs(prev->val - root->val));
+        prev = root;
+        if (root->right) dfs(root->right);
+    }
+    int getMinimumDifference(TreeNode *root) {
+        dfs(root);
+        return diff;
+    }
+};
+```
