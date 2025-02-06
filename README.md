@@ -5890,3 +5890,106 @@ public:
     }
 };
 ```
+
+#### 114. 230. Kth Smallest Element in a BST
+
+Given the root of a binary search tree, and an integer k, return the kth smallest value (1-indexed) of all the values of the nodes in the tree.
+ 
+
+Example 1:
+
+
+Input: root = [3,1,4,null,2], k = 1
+Output: 1
+Example 2:
+
+
+Input: root = [5,3,6,2,4,null,null,1], k = 3
+Output: 3 
+
+```cpp
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+
+    int dfs(TreeNode* root, int& k) {
+        if (root == nullptr) return -1;
+        int left = dfs(root->left, k);
+        if (left != -1) return left; 
+        k--;
+        if (k == 0) return root->val; 
+        return dfs(root->right, k);  
+    }
+
+    int kthSmallest(TreeNode* root, int k) {
+        return dfs(root, k);
+    }
+};
+```
+
+#### 115. 98. Validate Binary Search Tree
+
+Given the root of a binary tree, determine if it is a valid binary search tree (BST).
+
+A valid BST is defined as follows:
+
+The left 
+subtree
+ of a node contains only nodes with keys less than the node's key.
+The right subtree of a node contains only nodes with keys greater than the node's key.
+Both the left and right subtrees must also be binary search trees.
+ 
+
+Example 1:
+
+Input: root = [2,1,3]
+Output: true
+Example 2:
+
+
+Input: root = [5,1,4,null,null,3,6]
+Output: false
+Explanation: The root node's value is 5 but its right child's value is 4
+
+```cpp
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    pair<long long, long long> dfs(TreeNode* root, bool& res) {
+        if (root == nullptr) return {1e18, -1e18};
+        auto [mnl, mxl] = dfs(root->left, res);
+        auto [mnr, mxr] = dfs(root->right, res);
+        if (root->val <= mxl || root->val >= mnr) res = false;
+        return {min({mnl, mnr, (long long)root->val}), 
+                max({mxl, mxr, (long long)root->val})};
+    }
+
+    bool isValidBST(TreeNode* root) {
+        bool res = true;
+        dfs(root, res);
+        return res;
+    }
+};
+```
+
+#### 116. 
