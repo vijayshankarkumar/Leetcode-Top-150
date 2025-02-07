@@ -5992,4 +5992,1887 @@ public:
 };
 ```
 
-#### 116. 
+#### 116. 199. Binary Tree Right Side View
+
+Given the root of a binary tree, imagine yourself standing on the right side of it, return the values of the nodes you can see ordered from top to bottom.
+
+ 
+
+Example 1:
+
+Input: root = [1,2,3,null,5,null,4]
+
+Output: [1,3,4]
+
+Explanation:
+
+
+
+Example 2:
+
+Input: root = [1,2,3,4,null,null,null,5]
+
+Output: [1,3,4,5]
+
+Explanation:
+
+
+Example 3:
+
+Input: root = [1,null,3]
+
+Output: [1,3]
+
+Example 4:
+
+Input: root = []
+
+Output: []
+
+```cpp
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    void dfs(TreeNode* root, int curr, int& next, vector<int>& res) {
+        if (root == nullptr) return;
+        if (curr == next) {
+            res.push_back(root->val);
+            next++;
+        }
+        dfs(root->right, curr + 1, next, res);
+        dfs(root->left, curr + 1, next, res);
+    }
+
+    vector<int> rightSideView(TreeNode* root) {
+        vector<int> res;
+        int next = 0;
+        dfs(root, 0, next, res);
+        return res;
+    }
+};
+```
+
+#### 117. 637. Average of Levels in Binary Tree
+
+Given the root of a binary tree, return the average value of the nodes on each level in the form of an array. Answers within 10-5 of the actual answer will be accepted. 
+
+Example 1:
+
+
+Input: root = [3,9,20,null,null,15,7]
+Output: [3.00000,14.50000,11.00000]
+Explanation: The average value of nodes on level 0 is 3, on level 1 is 14.5, and on level 2 is 11.
+Hence return [3, 14.5, 11].
+Example 2:
+
+
+Input: root = [3,9,20,15,7]
+Output: [3.00000,14.50000,11.00000]
+
+```cpp
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    void dfs(TreeNode* root, int level, vector<pair<long long, int>>& avg) {
+        if (root == nullptr) return;
+        if (avg.size() == level) avg.push_back({root->val, 1});
+        else avg[level].first += root->val, avg[level].second++;
+        dfs(root->left, level + 1, avg);
+        dfs(root->right, level + 1, avg);
+    }
+
+    vector<double> averageOfLevels(TreeNode* root) {
+        vector<pair<long long, int>> avg;
+        dfs(root, 0, avg);
+        vector<double> res;
+        for (const auto& [s, n]: avg) res.push_back((double)s / (double)n);
+        return res;        
+    }
+};
+```
+
+#### 118. 102. Binary Tree Level Order Traversal
+
+Given the root of a binary tree, return the level order traversal of its nodes' values. (i.e., from left to right, level by level).
+ 
+
+Example 1:
+
+
+Input: root = [3,9,20,null,null,15,7]
+Output: [[3],[9,20],[15,7]]
+Example 2:
+
+Input: root = [1]
+Output: [[1]]
+Example 3:
+
+Input: root = []
+Output: []
+
+```cpp
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    void dfs(TreeNode* root, int level, vector<vector<int>>& res) {
+        if (root == nullptr) return;
+        if (res.size() == level) res.push_back({root->val});
+        else res[level].push_back(root->val);
+        dfs(root->left, level + 1, res);
+        dfs(root->right, level + 1, res);
+    }
+
+    vector<vector<int>> levelOrder(TreeNode* root) {
+        vector<vector<int>> res;
+        dfs(root, 0, res);
+        return res;
+    }
+};
+```
+
+#### 119. 103. Binary Tree Zigzag Level Order Traversal
+
+Given the root of a binary tree, return the zigzag level order traversal of its nodes' values. (i.e., from left to right, then right to left for the next level and alternate between).
+ 
+
+Example 1:
+
+
+Input: root = [3,9,20,null,null,15,7]
+Output: [[3],[20,9],[15,7]]
+Example 2:
+
+Input: root = [1]
+Output: [[1]]
+Example 3:
+
+Input: root = []
+Output: []
+
+```cpp
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     TreeNode *left;
+ *     TreeNode *right;
+ *     TreeNode() : val(0), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x) : val(x), left(nullptr), right(nullptr) {}
+ *     TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
+ * };
+ */
+class Solution {
+public:
+    vector<vector<int>> zigzagLevelOrder(TreeNode* root) {
+        if (root == nullptr) return {};
+        vector<vector<int>> res;
+        queue<TreeNode*> q;
+        q.push(root);
+        int level = 0;
+        while (!q.empty()) {
+            int sz = q.size();
+            vector<int> r;
+            while (sz--) {
+                auto node = q.front();
+                r.push_back(node->val);
+                q.pop();
+                if (node->left) q.push(node->left);
+                if (node->right) q.push(node->right);
+            }
+            if (level&1) reverse(r.begin(), r.end());
+            res.push_back(r);
+            level++;
+        }
+        return res;
+    }
+};
+```
+
+#### 120. 9. Palindrome Number
+
+Given an integer x, return true if x is a 
+palindrome, and false otherwise. 
+
+Example 1:
+
+Input: x = 121
+Output: true
+Explanation: 121 reads as 121 from left to right and from right to left.
+Example 2:
+
+Input: x = -121
+Output: false
+Explanation: From left to right, it reads -121. From right to left, it becomes 121-. Therefore it is not a palindrome.
+Example 3:
+
+Input: x = 10
+Output: false
+Explanation: Reads 01 from right to left. Therefore it is not a palindrome.
+
+```cpp
+class Solution {
+public:
+    bool isPalindrome(int x) {
+        if (x < 0) return false;
+        long long xx = x, y = 0;
+        while (xx) {
+            y = y * 10 + (xx % 10);
+            xx /= 10;
+        }
+        return x == y;
+    }
+};
+```
+
+#### 121. 66. Plus One
+
+You are given a large integer represented as an integer array digits, where each digits[i] is the ith digit of the integer. The digits are ordered from most significant to least significant in left-to-right order. The large integer does not contain any leading 0's.
+
+Increment the large integer by one and return the resulting array of digits.
+ 
+
+Example 1:
+
+Input: digits = [1,2,3]
+Output: [1,2,4]
+Explanation: The array represents the integer 123.
+Incrementing by one gives 123 + 1 = 124.
+Thus, the result should be [1,2,4].
+Example 2:
+
+Input: digits = [4,3,2,1]
+Output: [4,3,2,2]
+Explanation: The array represents the integer 4321.
+Incrementing by one gives 4321 + 1 = 4322.
+Thus, the result should be [4,3,2,2].
+Example 3:
+
+Input: digits = [9]
+Output: [1,0]
+Explanation: The array represents the integer 9.
+Incrementing by one gives 9 + 1 = 10.
+Thus, the result should be [1,0].
+
+```cpp
+class Solution {
+public:
+    vector<int> plusOne(vector<int>& digits) {
+        reverse(digits.begin(), digits.end());
+        int carry = 1;
+        for (auto& digit: digits) {
+            int curr = digit + carry;
+            digit = curr % 10;
+            carry = curr / 10;
+        }
+        if (carry) digits.push_back(carry);
+        reverse(digits.begin(), digits.end());
+        return digits;
+    }
+};
+```
+
+#### 122. 172. Factorial Trailing Zeroes
+
+Given an integer n, return the number of trailing zeroes in n!.
+
+Note that n! = n * (n - 1) * (n - 2) * ... * 3 * 2 * 1.
+ 
+
+Example 1:
+
+Input: n = 3
+Output: 0
+Explanation: 3! = 6, no trailing zero.
+Example 2:
+
+Input: n = 5
+Output: 1
+Explanation: 5! = 120, one trailing zero.
+Example 3:
+
+Input: n = 0
+Output: 0
+
+```cpp
+class Solution {
+public:
+    int trailingZeroes(int n) {
+        return n == 0 ? 0 : n / 5 + trailingZeroes(n / 5);
+    }
+};
+```
+
+#### 123. 69. Sqrt(x)
+
+Given a non-negative integer x, return the square root of x rounded down to the nearest integer. The returned integer should be non-negative as well.
+
+You must not use any built-in exponent function or operator.
+
+For example, do not use pow(x, 0.5) in c++ or x ** 0.5 in python.
+ 
+
+Example 1:
+
+Input: x = 4
+Output: 2
+Explanation: The square root of 4 is 2, so we return 2.
+Example 2:
+
+Input: x = 8
+Output: 2
+Explanation: The square root of 8 is 2.82842..., and since we round it down to the nearest integer, 2 is returned.
+
+```cpp
+class Solution {
+public:
+    int mySqrt(int x) {
+        int start = 0, end = x;
+        int ans = 0;
+        long mid;
+        while (start <= end) {
+            long mid = start + (end - start) / 2;
+            long mul = mid * mid;
+            if (mul == x) {
+                return mid;
+            } 
+            else if (mul > x) {
+                end = mid - 1;
+            } 
+            else {
+                start = mid + 1;
+                ans = mid;
+            }
+        }
+        return ans;
+    }
+};
+```
+
+#### 124. 50. Pow(x, n)
+
+Implement pow(x, n), which calculates x raised to the power n (i.e., xn).
+ 
+
+Example 1:
+
+Input: x = 2.00000, n = 10
+Output: 1024.00000
+Example 2:
+
+Input: x = 2.10000, n = 3
+Output: 9.26100
+Example 3:
+
+Input: x = 2.00000, n = -2
+Output: 0.25000
+Explanation: 2-2 = 1/22 = 1/4 = 0.25
+
+```cpp
+class Solution {
+public:
+    double myPow(double x, int n) {
+        return binaryExp(x, static_cast<long>(n));
+    }
+
+private:
+    double binaryExp(double x, long n) {
+        if (n == 0) {
+            return 1;
+        }
+       
+        if (n < 0) {
+            return 1.0 / binaryExp(x, -n);
+        }
+        if (n % 2 == 1) {
+            return x * binaryExp(x * x, (n - 1) / 2);
+        } 
+        else {
+            return binaryExp(x * x, n / 2);
+        }
+    }
+};
+```
+
+#### 125. 149. Max Points on a Line
+
+Given an array of points where points[i] = [xi, yi] represents a point on the X-Y plane, return the maximum number of points that lie on the same straight line.
+
+
+Example 1:
+
+
+Input: points = [[1,1],[2,2],[3,3]]
+Output: 3
+Example 2:
+
+
+Input: points = [[1,1],[3,2],[5,3],[4,1],[2,3],[1,4]]
+Output: 4
+
+```cpp
+class Solution {
+public:
+    int maxPoints(vector<vector<int>>& pt) {
+        int ans = 1; 
+        int n = pt.size();
+        for(int i=0; i < n - 1; i++){
+            map<double,int> mp;
+            for(int j = i + 1; j < n; j++){
+                double x = (double)(pt[j][1] - pt[i][1]) / (double)(pt[j][0] - pt[i][0]);
+                if(pt[j][1] - pt[i][1] < 0 && (pt[j][0] - pt[i][0]) == 0) mp[abs(x)]++; 
+                else mp[x]++;
+            }
+            int temp = 0;
+            for(auto it:mp) temp = max(temp, it.second+1);
+            ans = max(temp, ans);
+        }
+        return ans;
+    }
+};
+```
+
+#### 126. 67. Add Binary
+
+Given two binary strings a and b, return their sum as a binary string.
+ 
+
+Example 1:
+
+Input: a = "11", b = "1"
+Output: "100"
+Example 2:
+
+Input: a = "1010", b = "1011"
+Output: "10101"
+
+```cpp
+class Solution {
+public:
+    string addBinary(string a, string b) {
+        reverse(a.begin(), a.end());
+        reverse(b.begin(), b.end());
+
+        string res;
+        int carry = 0;
+        int n = max(a.size(), b.size());
+
+        for (int i = 0; i < n; i++) {
+            int digitA = (i < a.size()) ? (a[i] - '0') : 0;
+            int digitB = (i < b.size()) ? (b[i] - '0') : 0;
+            int curr = digitA + digitB + carry;
+
+            res.push_back('0' + (curr % 2)); 
+            carry = curr / 2; 
+        }
+
+        if (carry) res.push_back('1'); 
+
+        reverse(res.begin(), res.end()); 
+        return res;
+    }
+};
+```
+
+#### 127. 190. Reverse Bits
+
+Reverse bits of a given 32 bits unsigned integer.
+
+Note:
+
+Note that in some languages, such as Java, there is no unsigned integer type. In this case, both input and output will be given as a signed integer type. They should not affect your implementation, as the integer's internal binary representation is the same, whether it is signed or unsigned.
+In Java, the compiler represents the signed integers using 2's complement notation. Therefore, in Example 2 above, the input represents the signed integer -3 and the output represents the signed integer -1073741825.
+ 
+
+Example 1:
+
+Input: n = 00000010100101000001111010011100
+Output:    964176192 (00111001011110000010100101000000)
+Explanation: The input binary string 00000010100101000001111010011100 represents the unsigned integer 43261596, so return 964176192 which its binary representation is 00111001011110000010100101000000.
+Example 2:
+
+Input: n = 11111111111111111111111111111101
+Output:   3221225471 (10111111111111111111111111111111)
+Explanation: The input binary string 11111111111111111111111111111101 represents the unsigned integer 4294967293, so return 3221225471 which its binary representation is 10111111111111111111111111111111
+
+```cpp
+class Solution {
+public:
+    uint32_t reverseBits(uint32_t n) {
+        for (int i = 0, j = 31; i < j; i++, j--) {
+            int f = n & (1 << i), s = n & (1 << j);
+            if (s) n = n | (1 << i);
+            else n = n & ~(1 << i);
+            if (f) n = n | (1 << j);
+            else n = n & ~(1 << j);
+        }
+        return n;
+    }
+};
+```
+
+#### 128. Given a positive integer n, write a function that returns the number of 
+set bits in its binary representation (also known as the Hamming weight).
+ 
+
+Example 1:
+
+Input: n = 11
+
+Output: 3
+
+Explanation:
+
+The input binary string 1011 has a total of three set bits.
+
+Example 2:
+
+Input: n = 128
+
+Output: 1
+
+Explanation:
+
+The input binary string 10000000 has a total of one set bit.
+
+Example 3:
+
+Input: n = 2147483645
+
+Output: 30
+
+Explanation:
+
+The input binary string 1111111111111111111111111111101 has a total of thirty set bits
+
+```cpp
+class Solution {
+public:
+    int hammingWeight(int n) {
+        int res = 0;
+        while (n) {
+            res += n & 1;
+            n >>= 1;
+        }
+        return res;
+    }
+};
+```
+
+#### 129. 136. Single Number
+
+Given a non-empty array of integers nums, every element appears twice except for one. Find that single one.
+
+You must implement a solution with a linear runtime complexity and use only constant extra space.
+
+
+Example 1:
+
+Input: nums = [2,2,1]
+
+Output: 1
+
+Example 2:
+
+Input: nums = [4,1,2,1,2]
+
+Output: 4
+
+Example 3:
+
+Input: nums = [1]
+
+Output: 1
+
+```cpp
+class Solution {
+public:
+    int singleNumber(vector<int>& nums) {
+        int res = nums.back();
+        nums.pop_back();
+        for (const auto& num: nums) res ^= num;
+        return res;
+    }
+};
+```
+
+#### 130. 137. Single Number II
+
+Given an integer array nums where every element appears three times except for one, which appears exactly once. Find the single element and return it.
+
+You must implement a solution with a linear runtime complexity and use only constant extra space.
+ 
+
+Example 1:
+
+Input: nums = [2,2,3,2]
+Output: 3
+Example 2:
+
+Input: nums = [0,1,0,1,0,1,99]
+Output: 99
+
+```cpp
+class Solution {
+public:
+    int singleNumber(vector<int>& nums) {
+        int result = 0; 
+        for (int i = 0; i < 32; i++) {
+            int count = 0;
+            for (int num : nums) {
+                if (num & (1 << i)) count++;
+            }
+            if (count % 3 != 0) {
+                result |= (1 << i);
+            }
+        }
+        return result;
+    }
+};
+```
+
+#### 131. 201. Bitwise AND of Numbers Range
+
+Given two integers left and right that represent the range [left, right], return the bitwise AND of all numbers in this range, inclusive.
+ 
+
+Example 1:
+
+Input: left = 5, right = 7
+Output: 4
+Example 2:
+
+Input: left = 0, right = 0
+Output: 0
+Example 3:
+
+Input: left = 1, right = 2147483647
+Output: 0
+
+```cpp
+
+class Solution {
+public:
+    int rangeBitwiseAnd(int left, int right) {
+        int cnt = 0;
+        while (left != right) {
+            left >>= 1;
+            right >>= 1;
+            cnt++;
+        }
+        return (left << cnt);
+    }
+};
+```
+
+#### 132. 208. Implement Trie (Prefix Tree)
+
+A trie (pronounced as "try") or prefix tree is a tree data structure used to efficiently store and retrieve keys in a dataset of strings. There are various applications of this data structure, such as autocomplete and spellchecker.
+
+Implement the Trie class:
+
+Trie() Initializes the trie object.
+void insert(String word) Inserts the string word into the trie.
+boolean search(String word) Returns true if the string word is in the trie (i.e., was inserted before), and false otherwise.
+boolean startsWith(String prefix) Returns true if there is a previously inserted string word that has the prefix prefix, and false otherwise.
+ 
+
+Example 1:
+
+Input
+["Trie", "insert", "search", "search", "startsWith", "insert", "search"]
+[[], ["apple"], ["apple"], ["app"], ["app"], ["app"], ["app"]]
+Output
+[null, null, true, false, true, null, true]
+
+Explanation
+Trie trie = new Trie();
+trie.insert("apple");
+trie.search("apple");   // return True
+trie.search("app");     // return False
+trie.startsWith("app"); // return True
+trie.insert("app");
+trie.search("app");     // return True
+
+```cpp
+struct Node {
+    vector<Node*> child;
+    bool last;
+    Node() : child(vector<Node*>(26)), last(false) {}
+};
+
+class Trie {
+private: 
+    Node* root;
+public:
+    Trie() : root(new Node()) {
+        
+    }
+    
+    void insert(string word) {
+        insert(root, word, 0);
+    }
+
+    void insert(Node* node, const string& word, int idx) {
+        if (idx == word.size() - 1) {
+            if (node->child[word[idx] - 'a'] == nullptr) node->child[word[idx] - 'a'] = new Node();
+            node->child[word[idx] - 'a']->last = true;
+            return;
+        }
+        if (node->child[word[idx] - 'a'] == nullptr) node->child[word[idx] - 'a'] = new Node();
+        insert(node->child[word[idx] - 'a'], word, idx + 1);
+    }
+    
+    bool search(string word) {
+        return search(root, word, 0);
+    }
+
+    bool search(Node* node, const string& word, int idx) {
+        if (idx == word.size() - 1) {
+            return node->child[word[idx] - 'a'] != nullptr && node->child[word[idx] - 'a']->last;
+        }
+        if (node->child[word[idx] - 'a'] == nullptr) return false;
+        return search(node->child[word[idx] - 'a'], word, idx + 1);
+    }
+    
+    bool startsWith(string prefix) {
+        return startsWith(root, prefix, 0);
+    }
+
+    bool startsWith(Node* node, const string& word, int idx) {
+        if (idx == word.size()) return true;
+        if (node->child[word[idx] - 'a'] == nullptr) return false;
+        return startsWith(node->child[word[idx] - 'a'], word, idx + 1);
+    }
+};
+
+/**
+ * Your Trie object will be instantiated and called as such:
+ * Trie* obj = new Trie();
+ * obj->insert(word);
+ * bool param_2 = obj->search(word);
+ * bool param_3 = obj->startsWith(prefix);
+ */
+```
+
+#### 133. 211. Design Add and Search Words Data Structure
+
+Design a data structure that supports adding new words and finding if a string matches any previously added string.
+
+Implement the WordDictionary class:
+
+WordDictionary() Initializes the object.
+void addWord(word) Adds word to the data structure, it can be matched later.
+bool search(word) Returns true if there is any string in the data structure that matches word or false otherwise. word may contain dots '.' where dots can be matched with any letter.
+ 
+
+Example:
+
+Input
+["WordDictionary","addWord","addWord","addWord","search","search","search","search"]
+[[],["bad"],["dad"],["mad"],["pad"],["bad"],[".ad"],["b.."]]
+Output
+[null,null,null,null,false,true,true,true]
+
+Explanation
+WordDictionary wordDictionary = new WordDictionary();
+wordDictionary.addWord("bad");
+wordDictionary.addWord("dad");
+wordDictionary.addWord("mad");
+wordDictionary.search("pad"); // return False
+wordDictionary.search("bad"); // return True
+wordDictionary.search(".ad"); // return True
+wordDictionary.search("b.."); // return True
+
+```cpp
+struct Node {
+    vector<Node*> child;
+    bool last;
+    Node() : child(vector<Node*>(26)), last(false) {}
+};
+
+class WordDictionary {
+private: 
+    Node* root;
+
+public:
+    WordDictionary() : root(new Node()) {
+        
+    }
+    
+    void addWord(string word) {
+        addWord(root, word, 0);
+    }
+
+    void addWord(Node* node, const string& word, int idx) {
+        if (idx == word.size() - 1) {
+            if (node->child[word[idx] - 'a'] == nullptr) node->child[word[idx] - 'a'] = new Node();
+            node->child[word[idx] - 'a']->last = true;
+            return;
+        }
+        if (node->child[word[idx] - 'a'] == nullptr) node->child[word[idx] - 'a'] = new Node();
+        addWord(node->child[word[idx] - 'a'], word, idx + 1);
+    }
+    
+    bool search(string word) {
+        return search(root, word, 0);
+    }
+
+    bool search(Node* node, const string& word, int idx) {
+        if (idx == word.size() - 1) {
+            if (word[idx] == '.') {
+                for (const auto& c: node->child) if (c != nullptr && c->last) return true;
+                return false; 
+            }
+            return node->child[word[idx] - 'a'] != nullptr && node->child[word[idx] - 'a']->last;
+        }
+        if (word[idx] == '.') {
+            bool res = false;
+            for (const auto& c: node->child) if (c != nullptr) res |= search(c, word, idx + 1);
+            return res;
+        }
+        if (node->child[word[idx] - 'a'] == nullptr) return false;
+        return search(node->child[word[idx] - 'a'], word, idx + 1);
+    }
+};
+
+/**
+ * Your WordDictionary object will be instantiated and called as such:
+ * WordDictionary* obj = new WordDictionary();
+ * obj->addWord(word);
+ * bool param_2 = obj->search(word);
+ */
+```
+
+#### 134. 212. Word Search II
+
+Given an m x n board of characters and a list of strings words, return all words on the board.
+
+Each word must be constructed from letters of sequentially adjacent cells, where adjacent cells are horizontally or vertically neighboring. The same letter cell may not be used more than once in a word.
+ 
+
+Example 1:
+
+
+Input: board = [["o","a","a","n"],["e","t","a","e"],["i","h","k","r"],["i","f","l","v"]], words = ["oath","pea","eat","rain"]
+Output: ["eat","oath"]
+Example 2:
+
+
+Input: board = [["a","b"],["c","d"]], words = ["abcb"]
+Output: []
+
+```cpp
+struct Node {
+    vector<Node*> next;
+    vector<int> cnt;
+
+    Node(): next(27, nullptr), cnt(27, 0) {}
+};
+
+class Solution {
+public:
+    vector<string> result;
+    vector<string> findWords(vector<vector<char>>& board, vector<string>& words) {
+        Node* root = new Node();
+        for (string word : words) {
+            insert(word, root);
+        }
+
+        for(int i = 0 ; i < board.size() ; ++i)
+            for(int j = 0 ; j < board[0].size() ; ++j)
+                helper(board, i, j, "", root);
+
+        return result;
+    }
+
+    void helper(vector<vector<char>>& board, int i, int j, string pre, Node* root) {
+
+        if (i < 0 || i >= board.size() || j < 0 || j >= board[0].size() || board[i][j] == '*')
+            return;
+
+        pre += board[i][j];
+        pair<bool,bool> f = find(pre, root);
+
+        if(!f.second) 
+            return;
+        
+        if(f.first) {
+            result.push_back(pre);
+            deleteWord(pre, root);
+        }
+        
+        // cout << pre << ' ' << i << ' ' << j << ' ' << f.first << ' ' << f.second << endl;
+
+        char c = board[i][j];
+        board[i][j] = '*';
+
+        helper(board, i + 1, j, pre, root);
+        helper(board, i, j + 1, pre, root);
+        helper(board, i - 1, j, pre, root);
+        helper(board, i, j - 1, pre, root);
+
+        board[i][j] = c;
+    }
+
+
+
+    void insert(string word, Node* root) {
+        for(int i = 0 ; i < word.size() ; ++i) {
+            if(!root->next[word[i]-'a']) {            
+                root->next[word[i]-'a'] = new Node();
+            }
+            
+            root->cnt[word[i]-'a']++;
+            root = root->next[word[i]-'a'];
+        }
+        if (!root->next[26]) {           
+            root->next[26] = new Node();
+        }
+        root->cnt[26]++;
+    }
+
+    pair<bool,bool> find(string word, Node* root) {
+        for(int i = 0 ; i < word.size() ; ++i) {
+            if(!root->next[word[i]-'a']) {            
+                return {false, false};           
+            }
+
+            root = root->next[word[i]-'a'];
+        }
+
+        return {root->next[26], true};
+    }
+
+    void deleteWord(string word, Node* root) {
+        for(char c : word) {
+            root->cnt[c-'a']--;
+            Node* nxt = root->next[c-'a'];
+            if(root->cnt[c-'a'] == 0) {
+                root->next[c-'a'] = NULL;
+            }
+            root = nxt;
+        }
+        root->cnt[26]--;
+        if(root->cnt[26] == 0) {
+            root->next[26] = NULL;
+        }
+    }
+};
+```
+
+#### 135. 2. Add Two Numbers
+
+You are given two non-empty linked lists representing two non-negative integers. The digits are stored in reverse order, and each of their nodes contains a single digit. Add the two numbers and return the sum as a linked list.
+
+You may assume the two numbers do not contain any leading zero, except the number 0 itself.
+ 
+
+Example 1:
+
+
+Input: l1 = [2,4,3], l2 = [5,6,4]
+Output: [7,0,8]
+Explanation: 342 + 465 = 807.
+Example 2:
+
+Input: l1 = [0], l2 = [0]
+Output: [0]
+Example 3:
+
+Input: l1 = [9,9,9,9,9,9,9], l2 = [9,9,9,9]
+Output: [8,9,9,9,0,0,0,1]
+
+```cpp
+class Solution {
+public:
+    ListNode* addTwoNumbers(ListNode* l1, ListNode* l2) {
+        ListNode* dummyHead = new ListNode(0);
+        ListNode* tail = dummyHead;
+        int carry = 0;
+
+        while (l1 != nullptr || l2 != nullptr || carry != 0) {
+            int digit1 = (l1 != nullptr) ? l1->val : 0;
+            int digit2 = (l2 != nullptr) ? l2->val : 0;
+
+            int sum = digit1 + digit2 + carry;
+            int digit = sum % 10;
+            carry = sum / 10;
+
+            ListNode* newNode = new ListNode(digit);
+            tail->next = newNode;
+            tail = tail->next;
+
+            l1 = (l1 != nullptr) ? l1->next : nullptr;
+            l2 = (l2 != nullptr) ? l2->next : nullptr;
+        }
+
+        ListNode* result = dummyHead->next;
+        delete dummyHead;
+        return result;
+    }
+};
+```
+
+#### 136. 21. Merge Two Sorted Lists
+
+You are given the heads of two sorted linked lists list1 and list2.
+
+Merge the two lists into one sorted list. The list should be made by splicing together the nodes of the first two lists.
+
+Return the head of the merged linked list.
+ 
+
+Example 1:
+
+
+Input: list1 = [1,2,4], list2 = [1,3,4]
+Output: [1,1,2,3,4,4]
+Example 2:
+
+Input: list1 = [], list2 = []
+Output: []
+Example 3:
+
+Input: list1 = [], list2 = [0]
+Output: [0]
+
+```cpp
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* mergeTwoLists(ListNode* list1, ListNode* list2) {
+        ListNode* res = nullptr, *curr = nullptr;
+        while (list1 && list2) {
+            if (list1->val <= list2->val) {
+                ListNode* node = new ListNode(list1->val);
+                if (res == nullptr) res = node;
+                else curr->next = node;
+                curr = node;
+                list1 = list1->next;
+            }
+            else {
+                ListNode* node = new ListNode(list2->val);
+                if (res == nullptr) res = node;
+                else curr->next = node;
+                curr = node;
+                list2 = list2->next;
+            }
+        }
+        while (list1) {
+            ListNode* node = new ListNode(list1->val);
+            if (res == nullptr) res = node;
+            else curr->next = node;
+            curr = node;
+            list1 = list1->next;
+        }
+        while (list2) {
+            ListNode* node = new ListNode(list2->val);
+            if (res == nullptr) res = node;
+            else curr->next = node;
+            curr = node;
+            list2 = list2->next;
+        }
+        return res;
+    }
+};
+```
+
+#### 137. 138. Copy List with Random Pointer
+
+A linked list of length n is given such that each node contains an additional random pointer, which could point to any node in the list, or null.
+
+Construct a deep copy of the list. The deep copy should consist of exactly n brand new nodes, where each new node has its value set to the value of its corresponding original node. Both the next and random pointer of the new nodes should point to new nodes in the copied list such that the pointers in the original list and copied list represent the same list state. None of the pointers in the new list should point to nodes in the original list.
+
+For example, if there are two nodes X and Y in the original list, where X.random --> Y, then for the corresponding two nodes x and y in the copied list, x.random --> y.
+
+Return the head of the copied linked list.
+
+The linked list is represented in the input/output as a list of n nodes. Each node is represented as a pair of [val, random_index] where:
+
+val: an integer representing Node.val
+random_index: the index of the node (range from 0 to n-1) that the random pointer points to, or null if it does not point to any node.
+Your code will only be given the head of the original linked list.
+ 
+
+Example 1:
+
+
+Input: head = [[7,null],[13,0],[11,4],[10,2],[1,0]]
+Output: [[7,null],[13,0],[11,4],[10,2],[1,0]]
+Example 2:
+
+
+Input: head = [[1,1],[2,1]]
+Output: [[1,1],[2,1]]
+Example 3:
+
+
+
+Input: head = [[3,null],[3,0],[3,null]]
+Output: [[3,null],[3,0],[3,null]] 
+
+```cpp
+/*
+// Definition for a Node.
+class Node {
+public:
+    int val;
+    Node* next;
+    Node* random;
+    
+    Node(int _val) {
+        val = _val;
+        next = NULL;
+        random = NULL;
+    }
+};
+*/
+
+class Solution {
+public:
+    Node* copyRandomList(Node* head) {
+        map<Node*, Node*> oc, co;
+        Node* res = nullptr, *curr = nullptr;
+        while (head) {
+            Node* node = new Node(head->val);
+            oc[head] = node;
+            co[node] = head;
+            if (res == nullptr) res = node;
+            else curr->next = node;
+            curr = node;
+            head = head->next;
+        }
+        curr = res;
+        while (curr) {
+            if (co[curr]->random != nullptr) curr->random = oc[co[curr]->random];
+            curr = curr->next;
+        }
+        return res;
+    }
+};
+```
+
+#### 138. 92. Reverse Linked List II
+
+Given the head of a singly linked list and two integers left and right where left <= right, reverse the nodes of the list from position left to position right, and return the reversed list.
+ 
+
+Example 1:
+
+
+Input: head = [1,2,3,4,5], left = 2, right = 4
+Output: [1,4,3,2,5]
+Example 2:
+
+Input: head = [5], left = 1, right = 1
+Output: [5]
+
+```cpp
+class Solution {
+public:
+    ListNode* reverseBetween(ListNode* head, int left, int right) {
+        ListNode *dummy = new ListNode(0);
+        dummy->next = head;
+        ListNode *prev = dummy;
+        for(int i = 0; i < left - 1; i++) prev = prev->next;
+        ListNode *curr = prev->next;
+        for(int i = 0; i < right - left; i++){
+            ListNode *forw = curr->next;
+            curr->next = forw->next;
+            forw->next = prev->next;
+            prev->next = forw;
+        }
+        return dummy->next;
+    }
+};
+```
+
+#### 139. 61. Rotate List
+
+Given the head of a linked list, rotate the list to the right by k places.
+ 
+
+Example 1:
+
+
+Input: head = [1,2,3,4,5], k = 2
+Output: [4,5,1,2,3]
+Example 2:
+
+
+Input: head = [0,1,2], k = 4
+Output: [2,0,1]
+
+```cpp
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    int len(ListNode* head) {
+        int res = 0;
+        while (head) {
+            res++;
+            head = head->next;
+        }
+        return res;
+    }
+
+    ListNode* rotateRight(ListNode* head, int k) {
+        if (head == nullptr) return head;
+        k %= len(head);
+        if (k == 0) return head;
+        ListNode* left = nullptr, *right = head;
+        while (k-- > 1) right = right->next;
+        while (right->next != nullptr) {
+            left = left == nullptr ? head : left->next;
+            right = right->next;
+        }
+        ListNode* res = left->next;
+        left->next = nullptr;
+        right->next = head;
+        return res;
+    }
+};
+```
+
+#### 140. 19. Remove Nth Node From End of List
+
+Given the head of a linked list, remove the nth node from the end of the list and return its head.
+
+Example 1:
+
+
+Input: head = [1,2,3,4,5], n = 2
+Output: [1,2,3,5]
+Example 2:
+
+Input: head = [1], n = 1
+Output: []
+Example 3:
+
+Input: head = [1,2], n = 1
+Output: [1]
+
+```cpp
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    ListNode* removeNthFromEnd(ListNode* head, int n) {
+        ListNode* left = nullptr, *right = head;
+        while (n-- > 1) right = right->next;
+        while (right->next) {
+            left = left == nullptr ? head : left->next;
+            right = right->next;
+        }
+        if (left == nullptr) return head->next;
+        else left->next = left->next->next;
+        return head;
+    }
+};
+```
+
+#### 141. 86. Partition List
+
+Given the head of a linked list and a value x, partition it such that all nodes less than x come before nodes greater than or equal to x.
+
+You should preserve the original relative order of the nodes in each of the two partitions.
+
+Example 1:
+
+
+Input: head = [1,4,3,2,5,2], x = 3
+Output: [1,2,2,4,3,5]
+Example 2:
+
+Input: head = [2,1], x = 2
+Output: [1,2]
+
+```cpp
+class Solution {
+public:
+    ListNode* partition(ListNode* head, int x) {
+        ListNode *leftHead = new ListNode(0), *rightHead = new ListNode(0);
+        ListNode *left = leftHead, *right = rightHead;
+        while (head) {
+            if (head->val < x) {
+                left->next = head;
+                left = left->next;
+            } 
+            else {
+                right->next = head;
+                right = right->next;
+            }
+            head = head->next;
+        }
+        right->next = nullptr; 
+        left->next = rightHead->next;
+        return leftHead->next;
+    }
+};
+```
+
+#### 142. 82. Remove Duplicates from Sorted List II
+
+Given the head of a sorted linked list, delete all nodes that have duplicate numbers, leaving only distinct numbers from the original list. Return the linked list sorted as well.
+ 
+
+Example 1:
+
+Input: head = [1,2,3,3,4,4,5]
+Output: [1,2,5]
+Example 2:
+
+
+Input: head = [1,1,1,2,3]
+Output: [2,3]
+
+```cpp
+class Solution {
+public:
+    ListNode* deleteDuplicates(ListNode* head) {
+        if (!head || !head->next) return head;
+        int val = head->val;
+        ListNode* p = head->next;
+        if (p->val != val) {
+            head->next = deleteDuplicates(p);
+            return head;
+        } 
+        else {
+            while (p && p->val == val) p = p->next;
+            return deleteDuplicates(p);
+        }
+    }
+};
+```
+
+#### 143. 25. Reverse Nodes in k-Group
+
+Given the head of a linked list, reverse the nodes of the list k at a time, and return the modified list.
+
+k is a positive integer and is less than or equal to the length of the linked list. If the number of nodes is not a multiple of k then left-out nodes, in the end, should remain as it is.
+
+You may not alter the values in the list's nodes, only nodes themselves may be changed.
+ 
+
+Example 1:
+
+Input: head = [1,2,3,4,5], k = 2
+Output: [2,1,4,3,5]
+Example 2:
+
+
+Input: head = [1,2,3,4,5], k = 3
+Output: [3,2,1,4,5]
+
+```cpp
+/**
+ * Definition for singly-linked list.
+ * struct ListNode {
+ *     int val;
+ *     ListNode *next;
+ *     ListNode() : val(0), next(nullptr) {}
+ *     ListNode(int x) : val(x), next(nullptr) {}
+ *     ListNode(int x, ListNode *next) : val(x), next(next) {}
+ * };
+ */
+class Solution {
+public:
+    int count(ListNode* head){
+        int n = 0;
+        while(head){
+            head=head->next;
+            n++;
+        }
+        return n;
+    }
+
+    ListNode* reverseKGroup(ListNode* head, int k) {
+          int num = count(head);                                      
+          if(num < k){
+              return head;
+          }
+          int x = k;
+          ListNode *next, *prev=NULL;
+          ListNode *curr = head;
+          while(x--){
+              next = curr->next;
+              curr->next = prev;
+              prev = curr;
+              curr = next;
+          }
+          // 1->2->3->4....
+          head->next = reverseKGroup(next,k);
+          return prev;
+    }
+};
+```
+
+#### 144. 146. LRU Cache
+
+Design a data structure that follows the constraints of a Least Recently Used (LRU) cache.
+
+Implement the LRUCache class:
+
+LRUCache(int capacity) Initialize the LRU cache with positive size capacity.
+int get(int key) Return the value of the key if the key exists, otherwise return -1.
+void put(int key, int value) Update the value of the key if the key exists. Otherwise, add the key-value pair to the cache. If the number of keys exceeds the capacity from this operation, evict the least recently used key.
+The functions get and put must each run in O(1) average time complexity.
+ 
+
+Example 1:
+
+Input
+["LRUCache", "put", "put", "get", "put", "get", "put", "get", "get", "get"]
+[[2], [1, 1], [2, 2], [1], [3, 3], [2], [4, 4], [1], [3], [4]]
+Output
+[null, null, null, 1, null, -1, null, -1, 3, 4]
+
+Explanation
+LRUCache lRUCache = new LRUCache(2);
+lRUCache.put(1, 1); // cache is {1=1}
+lRUCache.put(2, 2); // cache is {1=1, 2=2}
+lRUCache.get(1);    // return 1
+lRUCache.put(3, 3); // LRU key was 2, evicts key 2, cache is {1=1, 3=3}
+lRUCache.get(2);    // returns -1 (not found)
+lRUCache.put(4, 4); // LRU key was 1, evicts key 1, cache is {4=4, 3=3}
+lRUCache.get(1);    // return -1 (not found)
+lRUCache.get(3);    // return 3
+lRUCache.get(4);    // return 4
+
+```cpp
+struct pair_hash {
+    std::size_t operator()(const std::pair<int, int>& p) const {
+        return std::hash<int>()(p.first) ^ std::hash<int>()(p.second);
+    }
+};
+
+class LRUCache {
+private:
+    int curr;
+    set<pair<int, pair<int, int>>> st;
+    unordered_map<pair<int, int>, int, pair_hash> tst;
+    int tot;
+    unordered_map<int, int> mp;
+
+public:
+    LRUCache(int capacity) : curr(0), tot(capacity) {
+        
+    }
+    
+    int get(int key) {
+        if (mp.find(key) != mp.end()) {
+            st.erase({tst[{key, mp[key]}], {key, mp[key]}});
+            st.insert({curr, {key, mp[key]}});
+            tst[{key, mp[key]}] = curr;
+            curr++;
+            return mp[key];
+        }
+        return -1;
+    }
+    
+    void put(int key, int value) {
+        if (mp.find(key) != mp.end()) {
+            st.erase({tst[{key, mp[key]}], {key, mp[key]}});
+            st.insert({curr, {key, value}});
+            tst[{key, value}] = curr;
+            mp[key] = value;
+            curr++;
+        }
+        else {
+            if (mp.size() == tot) {
+                int k = st.begin()->second.first, v = st.begin()->second.second;
+                st.erase(st.begin());
+                tst.erase({k, v});
+                mp.erase(k);
+            }
+            st.insert({curr, {key, value}});
+            tst[{key, value}] = curr;
+            mp[key] = value;
+            curr++;
+        }
+    }
+};
+
+/**
+ * Your LRUCache object will be instantiated and called as such:
+ * LRUCache* obj = new LRUCache(capacity);
+ * int param_1 = obj->get(key);
+ * obj->put(key,value);
+ */
+```
+
+#### 145. 221. Maximal Square
+
+Given an m x n binary matrix filled with 0's and 1's, find the largest square containing only 1's and return its area.
+ 
+
+Example 1:
+
+Input: matrix = [["1","0","1","0","0"],["1","0","1","1","1"],["1","1","1","1","1"],["1","0","0","1","0"]]
+Output: 4
+Example 2:
+
+
+Input: matrix = [["0","1"],["1","0"]]
+Output: 1
+Example 3:
+
+Input: matrix = [["0"]]
+Output: 0
+
+```cpp
+class Solution {
+public:
+    int maximalSquare(vector<vector<char>>& mat) {
+        vector<vector<int>> dp(mat.size(), vector<int>(mat[0].size()));
+        int ans = 0;
+        for (int i = 0; i < mat.size(); i++) {
+            for (int j = 0; j < mat[0].size(); j++) {
+                if (i == 0 || j == 0) dp[i][j] = mat[i][j] - '0';
+                else if (mat[i][j] == '1') dp[i][j] = min({dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]}) + 1;
+                ans = max(ans, dp[i][j] * dp[i][j]);
+            }
+        }
+        return ans;
+    }
+};
+```
+
+#### 146. 123. Best Time to Buy and Sell Stock III
+
+You are given an array prices where prices[i] is the price of a given stock on the ith day.
+
+Find the maximum profit you can achieve. You may complete at most two transactions.
+
+Note: You may not engage in multiple transactions simultaneously (i.e., you must sell the stock before you buy again).
+ 
+
+Example 1:
+
+Input: prices = [3,3,5,0,0,3,1,4]
+Output: 6
+Explanation: Buy on day 4 (price = 0) and sell on day 6 (price = 3), profit = 3-0 = 3.
+Then buy on day 7 (price = 1) and sell on day 8 (price = 4), profit = 4-1 = 3.
+Example 2:
+
+Input: prices = [1,2,3,4,5]
+Output: 4
+Explanation: Buy on day 1 (price = 1) and sell on day 5 (price = 5), profit = 5-1 = 4.
+Note that you cannot buy on day 1, buy on day 2 and sell them later, as you are engaging multiple transactions at the same time. You must sell before buying again.
+Example 3:
+
+Input: prices = [7,6,4,3,1]
+Output: 0
+Explanation: In this case, no transaction is done, i.e. max profit = 0.
+
+```cpp
+class Solution {
+public:
+    int maxProfit(vector<int>& prices) {
+        if (!prices.size()) return 0;
+        int n = prices.size();
+        int left[n], right[n];
+        int leftmin = prices[0], rightmax = prices[n - 1], maxprofit = 0;
+        left[0] = 0;
+        right[n - 1] = 0;
+        for (int i = 1, j = n - 2; i < n, j >= 0; i++, j--) {
+            leftmin = min(leftmin, prices[i]);
+            left[i] = max(left[i - 1], prices[i] - leftmin);
+            rightmax = max(rightmax, prices[j]);
+            right[j] = max(right[j + 1], rightmax - prices[j]);
+        }
+        for (int i = 0; i < n; i++) {
+            maxprofit = max(maxprofit, left[i] + right[i]);
+        }
+        return maxprofit;
+    }
+};
+```
+
+#### 147. 188. Best Time to Buy and Sell Stock IV
+
+You are given an integer array prices where prices[i] is the price of a given stock on the ith day, and an integer k.
+
+Find the maximum profit you can achieve. You may complete at most k transactions: i.e. you may buy at most k times and sell at most k times.
+
+Note: You may not engage in multiple transactions simultaneously (i.e., you must sell the stock before you buy again).
+ 
+
+Example 1:
+
+Input: k = 2, prices = [2,4,1]
+Output: 2
+Explanation: Buy on day 1 (price = 2) and sell on day 2 (price = 4), profit = 4-2 = 2.
+Example 2:
+
+Input: k = 2, prices = [3,2,6,5,0,3]
+Output: 7
+Explanation: Buy on day 2 (price = 2) and sell on day 3 (price = 6), profit = 6-2 = 4. Then buy on day 5 (price = 0) and sell on day 6 (price = 3), profit = 3-0 = 3.
+
+```cpp
+class Solution {
+public:
+    int maxProfit(int k, vector<int>& prices) {
+        int n = prices.size();
+        vector<vector<vector<int>>> dp(
+            n + 1, vector<vector<int>>(2, vector<int>(k + 1, 0)));
+        for (int ind = n - 1; ind >= 0; ind--) {
+            for (int buy = 0; buy <= 1; buy++) {
+                for (int cap = 1; cap <= k; cap++) {
+                    if (buy == 1) {
+                        dp[ind][buy][cap] =
+                            max(-prices[ind] + dp[ind + 1][0][cap],
+                                0 + dp[ind + 1][1][cap]);
+                    } else {
+                        dp[ind][buy][cap] =
+                            max(prices[ind] + dp[ind + 1][1][cap - 1],
+                                0 + dp[ind + 1][0][cap]);
+                    }
+                }
+            }
+        }
+        return dp[0][1][k];
+    }
+};
+```
+
+#### 148. 433. Minimum Genetic Mutation
+
+A gene string can be represented by an 8-character long string, with choices from 'A', 'C', 'G', and 'T'.
+
+Suppose we need to investigate a mutation from a gene string startGene to a gene string endGene where one mutation is defined as one single character changed in the gene string.
+
+For example, "AACCGGTT" --> "AACCGGTA" is one mutation.
+There is also a gene bank bank that records all the valid gene mutations. A gene must be in bank to make it a valid gene string.
+
+Given the two gene strings startGene and endGene and the gene bank bank, return the minimum number of mutations needed to mutate from startGene to endGene. If there is no such a mutation, return -1.
+
+Note that the starting point is assumed to be valid, so it might not be included in the bank.
+ 
+
+Example 1:
+
+Input: startGene = "AACCGGTT", endGene = "AACCGGTA", bank = ["AACCGGTA"]
+Output: 1
+Example 2:
+
+Input: startGene = "AACCGGTT", endGene = "AAACGGTA", bank = ["AACCGGTA","AACCGCTA","AAACGGTA"]
+Output: 2
+
+```cpp
+class Solution {
+public:
+    int minMutation(string start, string end, vector<string>& bank) {
+        unordered_set<string> st{bank.begin(), bank.end()};
+        if (!st.count(end)) return -1;
+        queue<string> Q;
+        Q.push(start);
+        int steps = 0, s;
+        string cur, t;
+        while (!Q.empty()) {
+            s = Q.size();
+            while (s--) {
+                cur = Q.front();
+                Q.pop();
+                if (cur == end) return steps;
+                st.erase(cur);
+                for (int i = 0; i < 8; i++) {
+                    t = cur;
+                    t[i] = 'A';
+                    if (st.count(t)) Q.push(t);
+                    t[i] = 'C';
+                    if (st.count(t)) Q.push(t);
+                    t[i] = 'G';
+                    if (st.count(t)) Q.push(t);
+                    t[i] = 'T';
+                    if (st.count(t)) Q.push(t);
+                }
+            }
+            steps++;
+        }
+        return -1;
+    }
+};
+```
+
+#### 149. 909. Snakes and Ladders
+
+You are given an n x n integer matrix board where the cells are labeled from 1 to n2 in a Boustrophedon style starting from the bottom left of the board (i.e. board[n - 1][0]) and alternating direction each row.
+
+You start on square 1 of the board. In each move, starting from square curr, do the following:
+
+Choose a destination square next with a label in the range [curr + 1, min(curr + 6, n2)].
+This choice simulates the result of a standard 6-sided die roll: i.e., there are always at most 6 destinations, regardless of the size of the board.
+If next has a snake or ladder, you must move to the destination of that snake or ladder. Otherwise, you move to next.
+The game ends when you reach the square n2.
+A board square on row r and column c has a snake or ladder if board[r][c] != -1. The destination of that snake or ladder is board[r][c]. Squares 1 and n2 are not the starting points of any snake or ladder.
+
+Note that you only take a snake or ladder at most once per dice roll. If the destination to a snake or ladder is the start of another snake or ladder, you do not follow the subsequent snake or ladder.
+
+For example, suppose the board is [[-1,4],[-1,3]], and on the first move, your destination square is 2. You follow the ladder to square 3, but do not follow the subsequent ladder to 4.
+Return the least number of dice rolls required to reach the square n2. If it is not possible to reach the square, return -1.
+ 
+
+Example 1:
+
+Input: board = [[-1,-1,-1,-1,-1,-1],[-1,-1,-1,-1,-1,-1],[-1,-1,-1,-1,-1,-1],[-1,35,-1,-1,13,-1],[-1,-1,-1,-1,-1,-1],[-1,15,-1,-1,-1,-1]]
+Output: 4
+Explanation: 
+In the beginning, you start at square 1 (at row 5, column 0).
+You decide to move to square 2 and must take the ladder to square 15.
+You then decide to move to square 17 and must take the snake to square 13.
+You then decide to move to square 14 and must take the ladder to square 35.
+You then decide to move to square 36, ending the game.
+This is the lowest possible number of moves to reach the last square, so return 4.
+Example 2:
+
+Input: board = [[-1,-1],[-1,3]]
+Output: 1
+
+```cpp
+class Solution {
+public:
+    int snakesAndLadders(vector<vector<int>>& board) {
+        int n = board.size(), lbl = 1;
+        vector<pair<int, int>> cells(n * n + 1);
+        vector<int> columns(n);
+        iota(columns.begin(), columns.end(), 0);
+        for (int row = n - 1; row >= 0; row--) {
+            for (int column : columns) {
+                cells[lbl++] = {row, column};
+            }
+            reverse(columns.begin(), columns.end());
+        }
+        vector<int> dist(n * n + 1, -1);
+        dist[1] = 0;
+        queue<int> q;
+        q.push(1);
+        while (!q.empty()) {
+            int curr = q.front();
+            q.pop();
+            for (int next = curr + 1; next <= min(curr + 6, n * n); next++) {
+                auto [row, column] = cells[next];
+                int destination = board[row][column] != -1 ? board[row][column] : next;
+                if (dist[destination] == -1) {
+                    dist[destination] = dist[curr] + 1;
+                    q.push(destination);
+                }
+            }
+        }
+        return dist[n * n];
+    }
+};
+```
+
+#### 150. 127. Word Ladder
+
+A transformation sequence from word beginWord to word endWord using a dictionary wordList is a sequence of words beginWord -> s1 -> s2 -> ... -> sk such that:
+
+Every adjacent pair of words differs by a single letter.
+Every si for 1 <= i <= k is in wordList. Note that beginWord does not need to be in wordList.
+sk == endWord
+Given two words, beginWord and endWord, and a dictionary wordList, return the number of words in the shortest transformation sequence from beginWord to endWord, or 0 if no such sequence exists.
+ 
+
+Example 1:
+
+Input: beginWord = "hit", endWord = "cog", wordList = ["hot","dot","dog","lot","log","cog"]
+Output: 5
+Explanation: One shortest transformation sequence is "hit" -> "hot" -> "dot" -> "dog" -> cog", which is 5 words long.
+Example 2:
+
+Input: beginWord = "hit", endWord = "cog", wordList = ["hot","dot","dog","lot","log"]
+Output: 0
+Explanation: The endWord "cog" is not in wordList, therefore there is no valid transformation sequence
+
+```cpp
+class Solution {
+public:
+    int ladderLength(string beginWord, string endWord, vector<string>& wordList) {
+        unordered_set<string> dict(wordList.begin(), wordList.end());
+        if (dict.find(endWord) == dict.end()) return 0;
+        unordered_set<string> beginSet{beginWord}, endSet{endWord};
+        int level = 1;
+        while (!beginSet.empty() && !endSet.empty()) {
+            if (beginSet.size() > endSet.size()) swap(beginSet, endSet);
+            unordered_set<string> nextSet;
+            for (auto word : beginSet) {
+                for (int i = 0; i < word.size(); i++) {
+                    char original = word[i];
+                    for (char c = 'a'; c <= 'z'; c++) {
+                        word[i] = c;
+                        if (endSet.find(word) != endSet.end()) return level + 1;
+                        if (dict.find(word) != dict.end()) {
+                            nextSet.insert(word);
+                            dict.erase(word);
+                        }
+                    }
+                    word[i] = original;
+                }
+            }
+            beginSet = nextSet;
+            level++;
+        }
+        return 0;
+    }
+};
+```
+
+
+### Complete (-_-)
